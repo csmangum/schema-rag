@@ -1,0 +1,17 @@
+{
+  "run": ["usage", "execution", "executed"],
+  "times": ["count", "usage"],
+  "executed": ["execution", "run"],
+  "failed": ["failure", "error"],
+  "succeeded": ["success", "win"],
+  "average": ["avg", "mean"],
+  "duration": ["time", "execution_time"],
+  "memory": ["memory_usage"],
+  "how many": ["count", "number", "total"],
+  "number of": ["count", "total"],
+  "total": ["count", "sum"],
+  "rate": ["ratio", "percentage"],
+  "percentage": ["rate", "ratio"],
+  "trend": ["pattern", "change", "over time"],
+  "over time": ["trend", "temporal", "history"]
+}

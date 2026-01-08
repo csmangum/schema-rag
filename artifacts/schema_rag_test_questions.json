@@ -1,0 +1,772 @@
+[
+  {
+    "question": "What is the success count for the forest fire program",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "id": 1,
+    "category": "general"
+  },
+  {
+    "question": "How many failures for program forest fire",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "failure_count",
+    "id": 2,
+    "category": "general"
+  },
+  {
+    "question": "How many times was forest fire run",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "id": 3,
+    "category": "general"
+  },
+  {
+    "question": "Average execution time for forest fire program",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "avg_execution_time",
+    "id": 4,
+    "category": "general"
+  },
+  {
+    "question": "What programs have more than 100 successes",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "id": 5,
+    "category": "general"
+  },
+  {
+    "question": "Show me programs with less than 10 failures",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "failure_count",
+    "id": 6,
+    "category": "general"
+  },
+  {
+    "question": "Which program has the highest usage count",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "id": 7,
+    "category": "general"
+  },
+  {
+    "question": "Memory usage for program execution",
+    "expected_model": "ProgramExecution",
+    "expected_column": "memory_usage",
+    "id": 8,
+    "category": "general"
+  },
+  {
+    "question": "Execution time for program runs",
+    "expected_model": "ProgramExecution",
+    "expected_column": "execution_time",
+    "id": 9,
+    "category": "general"
+  },
+  {
+    "question": "Failed program executions",
+    "expected_model": "ProgramExecution",
+    "expected_column": "success",
+    "id": 10,
+    "category": "general"
+  },
+  {
+    "question": "Program variants for a specific program",
+    "expected_model": "ProgramVariant",
+    "expected_column": "name",
+    "id": 11,
+    "category": "general"
+  },
+  {
+    "question": "List all program names",
+    "expected_model": "Program",
+    "expected_column": "name",
+    "id": 12,
+    "category": "general"
+  },
+  {
+    "question": "Program descriptions",
+    "expected_model": "Program",
+    "expected_column": "description",
+    "id": 13,
+    "category": "general"
+  },
+  {
+    "question": "Programs created in 2024",
+    "expected_model": "Program",
+    "expected_column": "created_at",
+    "id": 14,
+    "category": "general"
+  },
+  {
+    "question": "Program categories",
+    "expected_model": "Program",
+    "expected_column": "category",
+    "id": 15,
+    "category": "general"
+  },
+  {
+    "question": "Success rate for programs",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "id": 16,
+    "category": "general"
+  },
+  {
+    "question": "Program execution history",
+    "expected_model": "ProgramExecution",
+    "expected_column": "executed_at",
+    "id": 17,
+    "category": "general"
+  },
+  {
+    "question": "Programs with variants",
+    "expected_model": "ProgramVariant",
+    "expected_column": "program_id",
+    "id": 18,
+    "category": "general"
+  },
+  {
+    "question": "Average memory usage across all programs",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "avg_memory_usage",
+    "id": 19,
+    "category": "general"
+  },
+  {
+    "question": "Programs last used recently",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "last_used_at",
+    "id": 20,
+    "category": "general"
+  },
+  {
+    "question": "How many simulations are running",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "id": 21,
+    "category": "general"
+  },
+  {
+    "question": "Simulation names and descriptions",
+    "expected_model": "Simulation",
+    "expected_column": "name",
+    "id": 22,
+    "category": "general"
+  },
+  {
+    "question": "Total steps for a simulation",
+    "expected_model": "Simulation",
+    "expected_column": "total_steps",
+    "id": 23,
+    "category": "general"
+  },
+  {
+    "question": "Final population of simulations",
+    "expected_model": "Simulation",
+    "expected_column": "final_population",
+    "id": 24,
+    "category": "general"
+  },
+  {
+    "question": "Simulations started in the last week",
+    "expected_model": "Simulation",
+    "expected_column": "started_at",
+    "id": 25,
+    "category": "general"
+  },
+  {
+    "question": "Completed simulations",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "id": 26,
+    "category": "general"
+  },
+  {
+    "question": "Simulation configuration parameters",
+    "expected_model": "SimulationConfig",
+    "expected_column": "parameters",
+    "id": 27,
+    "category": "general"
+  },
+  {
+    "question": "Simulation template names",
+    "expected_model": "SimulationConfig",
+    "expected_column": "template_name",
+    "id": 28,
+    "category": "general"
+  },
+  {
+    "question": "Metrics for simulation step 100",
+    "expected_model": "SimulationMetrics",
+    "expected_column": "metrics",
+    "id": 29,
+    "category": "general"
+  },
+  {
+    "question": "Simulation metrics by step",
+    "expected_model": "SimulationMetrics",
+    "expected_column": "step",
+    "id": 30,
+    "category": "general"
+  },
+  {
+    "question": "Agent snapshots at step 50",
+    "expected_model": "AgentSnapshot",
+    "expected_column": "agent_data",
+    "id": 31,
+    "category": "general"
+  },
+  {
+    "question": "Agent positions in simulation",
+    "expected_model": "AgentSnapshot",
+    "expected_column": "agent_data",
+    "id": 32,
+    "category": "general"
+  },
+  {
+    "question": "Agent introspection data",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "memory_state",
+    "id": 33,
+    "category": "general"
+  },
+  {
+    "question": "Agent health values",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "health",
+    "id": 34,
+    "category": "general"
+  },
+  {
+    "question": "Agent resources",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "resources",
+    "id": 35,
+    "category": "general"
+  },
+  {
+    "question": "Agent lineage parent relationships",
+    "expected_model": "AgentLineage",
+    "expected_column": "parent_id",
+    "id": 36,
+    "category": "general"
+  },
+  {
+    "question": "Agent birth steps",
+    "expected_model": "AgentLineage",
+    "expected_column": "birth_step",
+    "id": 37,
+    "category": "general"
+  },
+  {
+    "question": "Agent death steps",
+    "expected_model": "AgentLineage",
+    "expected_column": "death_step",
+    "id": 38,
+    "category": "general"
+  },
+  {
+    "question": "Agent mutations",
+    "expected_model": "AgentLineage",
+    "expected_column": "mutations",
+    "id": 39,
+    "category": "general"
+  },
+  {
+    "question": "Simulation current step",
+    "expected_model": "Simulation",
+    "expected_column": "current_step",
+    "id": 40,
+    "category": "general"
+  },
+  {
+    "question": "Experiment names and hypotheses",
+    "expected_model": "Experiment",
+    "expected_column": "name",
+    "id": 41,
+    "category": "general"
+  },
+  {
+    "question": "Experiments with status completed",
+    "expected_model": "Experiment",
+    "expected_column": "status",
+    "id": 42,
+    "category": "general"
+  },
+  {
+    "question": "Experiment base parameters",
+    "expected_model": "Experiment",
+    "expected_column": "base_parameters",
+    "id": 43,
+    "category": "general"
+  },
+  {
+    "question": "Target iterations for experiments",
+    "expected_model": "Experiment",
+    "expected_column": "target_iterations",
+    "id": 44,
+    "category": "general"
+  },
+  {
+    "question": "Completed iterations count",
+    "expected_model": "Experiment",
+    "expected_column": "completed_iterations",
+    "id": 45,
+    "category": "general"
+  },
+  {
+    "question": "Experiment success criteria",
+    "expected_model": "Experiment",
+    "expected_column": "success_criteria",
+    "id": 46,
+    "category": "general"
+  },
+  {
+    "question": "Experiment results summary",
+    "expected_model": "Experiment",
+    "expected_column": "results_summary",
+    "id": 47,
+    "category": "general"
+  },
+  {
+    "question": "Experiments started at timestamp",
+    "expected_model": "Experiment",
+    "expected_column": "started_at",
+    "id": 48,
+    "category": "general"
+  },
+  {
+    "question": "Experiments completed at timestamp",
+    "expected_model": "Experiment",
+    "expected_column": "completed_at",
+    "id": 49,
+    "category": "general"
+  },
+  {
+    "question": "Experiment simulation links",
+    "expected_model": "ExperimentSimulation",
+    "expected_column": "simulation_id",
+    "id": 50,
+    "category": "general"
+  },
+  {
+    "question": "Experiment iteration numbers",
+    "expected_model": "ExperimentSimulation",
+    "expected_column": "iteration",
+    "id": 51,
+    "category": "general"
+  },
+  {
+    "question": "Parameter overrides for experiment simulations",
+    "expected_model": "ExperimentSimulation",
+    "expected_column": "parameters_override",
+    "id": 52,
+    "category": "general"
+  },
+  {
+    "question": "Experiments linked to research",
+    "expected_model": "Experiment",
+    "expected_column": "research_id",
+    "id": 53,
+    "category": "general"
+  },
+  {
+    "question": "Experiment assumptions",
+    "expected_model": "Experiment",
+    "expected_column": "assumptions",
+    "id": 54,
+    "category": "general"
+  },
+  {
+    "question": "Experiment metrics list",
+    "expected_model": "Experiment",
+    "expected_column": "metrics",
+    "id": 55,
+    "category": "general"
+  },
+  {
+    "question": "Research project names",
+    "expected_model": "Research",
+    "expected_column": "name",
+    "id": 56,
+    "category": "general"
+  },
+  {
+    "question": "Research descriptions",
+    "expected_model": "Research",
+    "expected_column": "description",
+    "id": 57,
+    "category": "general"
+  },
+  {
+    "question": "Research goals",
+    "expected_model": "Research",
+    "expected_column": "goals",
+    "id": 58,
+    "category": "general"
+  },
+  {
+    "question": "Research methodology",
+    "expected_model": "Research",
+    "expected_column": "methodology",
+    "id": 59,
+    "category": "general"
+  },
+  {
+    "question": "Research status active",
+    "expected_model": "Research",
+    "expected_column": "status",
+    "id": 60,
+    "category": "general"
+  },
+  {
+    "question": "Research questions prompts",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "prompt",
+    "id": 61,
+    "category": "general"
+  },
+  {
+    "question": "Research question answers",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "answer",
+    "id": 62,
+    "category": "general"
+  },
+  {
+    "question": "Research question status",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "status",
+    "id": 63,
+    "category": "general"
+  },
+  {
+    "question": "Research question priority",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "priority",
+    "id": 64,
+    "category": "general"
+  },
+  {
+    "question": "Research insights",
+    "expected_model": "Research",
+    "expected_column": "insights",
+    "id": 65,
+    "category": "general"
+  },
+  {
+    "question": "Research tags",
+    "expected_model": "Research",
+    "expected_column": "tags",
+    "id": 66,
+    "category": "general"
+  },
+  {
+    "question": "Research structured methodology",
+    "expected_model": "Research",
+    "expected_column": "methodology_structured",
+    "id": 67,
+    "category": "general"
+  },
+  {
+    "question": "Research questions related experiments",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "related_experiment_ids",
+    "id": 68,
+    "category": "general"
+  },
+  {
+    "question": "Research questions related simulations",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "related_simulation_ids",
+    "id": 69,
+    "category": "general"
+  },
+  {
+    "question": "Research updated recently",
+    "expected_model": "Research",
+    "expected_column": "updated_at",
+    "id": 70,
+    "category": "general"
+  },
+  {
+    "question": "Chat messages for a simulation",
+    "expected_model": "ChatMessage",
+    "expected_column": "content",
+    "id": 71,
+    "category": "general"
+  },
+  {
+    "question": "Chat message types",
+    "expected_model": "ChatMessage",
+    "expected_column": "message_type",
+    "id": 72,
+    "category": "general"
+  },
+  {
+    "question": "Chat messages by session",
+    "expected_model": "ChatMessage",
+    "expected_column": "session_id",
+    "id": 73,
+    "category": "general"
+  },
+  {
+    "question": "Chat message metadata",
+    "expected_model": "ChatMessage",
+    "expected_column": "message_metadata",
+    "id": 74,
+    "category": "general"
+  },
+  {
+    "question": "Assistant ratings for messages",
+    "expected_model": "AssistantRating",
+    "expected_column": "rating",
+    "id": 75,
+    "category": "general"
+  },
+  {
+    "question": "Assistant rating comments",
+    "expected_model": "AssistantRating",
+    "expected_column": "comment",
+    "id": 76,
+    "category": "general"
+  },
+  {
+    "question": "Assistant studio traces",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "user_message",
+    "id": 77,
+    "category": "general"
+  },
+  {
+    "question": "Assistant studio response content",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "response_content",
+    "id": 78,
+    "category": "general"
+  },
+  {
+    "question": "Tool calls in assistant traces",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "tool_calls",
+    "id": 79,
+    "category": "general"
+  },
+  {
+    "question": "Token usage in assistant traces",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "token_usage",
+    "id": 80,
+    "category": "general"
+  },
+  {
+    "question": "Metric definition keys",
+    "expected_model": "MetricDefinition",
+    "expected_column": "key",
+    "id": 81,
+    "category": "general"
+  },
+  {
+    "question": "Metric definition labels",
+    "expected_model": "MetricDefinition",
+    "expected_column": "label",
+    "id": 82,
+    "category": "general"
+  },
+  {
+    "question": "Metric categories",
+    "expected_model": "MetricDefinition",
+    "expected_column": "category",
+    "id": 83,
+    "category": "general"
+  },
+  {
+    "question": "Metric format types",
+    "expected_model": "MetricDefinition",
+    "expected_column": "format",
+    "id": 84,
+    "category": "general"
+  },
+  {
+    "question": "Metric tags",
+    "expected_model": "MetricTag",
+    "expected_column": "name",
+    "id": 85,
+    "category": "general"
+  },
+  {
+    "question": "Tool telemetry events",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "tool_name",
+    "id": 86,
+    "category": "general"
+  },
+  {
+    "question": "Tool execution duration",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "duration_ms",
+    "id": 87,
+    "category": "general"
+  },
+  {
+    "question": "Tool success status",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "success",
+    "id": 88,
+    "category": "general"
+  },
+  {
+    "question": "Tool error messages",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "error_message",
+    "id": 89,
+    "category": "general"
+  },
+  {
+    "question": "Tool telemetry metadata",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "metadata",
+    "id": 90,
+    "category": "general"
+  },
+  {
+    "question": "User sessions",
+    "expected_model": "UserSession",
+    "expected_column": "session_id",
+    "id": 91,
+    "category": "general"
+  },
+  {
+    "question": "User selected models",
+    "expected_model": "UserSession",
+    "expected_column": "selected_model",
+    "id": 92,
+    "category": "general"
+  },
+  {
+    "question": "User research events",
+    "expected_model": "UserResearchEvent",
+    "expected_column": "event_type",
+    "id": 93,
+    "category": "general"
+  },
+  {
+    "question": "User research event categories",
+    "expected_model": "UserResearchEvent",
+    "expected_column": "category",
+    "id": 94,
+    "category": "general"
+  },
+  {
+    "question": "User research event importance",
+    "expected_model": "UserResearchEvent",
+    "expected_column": "importance",
+    "id": 95,
+    "category": "general"
+  },
+  {
+    "question": "User research profiles",
+    "expected_model": "UserResearchProfile",
+    "expected_column": "display_name",
+    "id": 96,
+    "category": "general"
+  },
+  {
+    "question": "User research interests",
+    "expected_model": "UserResearchProfile",
+    "expected_column": "research_interests",
+    "id": 97,
+    "category": "general"
+  },
+  {
+    "question": "User short term goals",
+    "expected_model": "UserResearchProfile",
+    "expected_column": "short_term_goals",
+    "id": 98,
+    "category": "general"
+  },
+  {
+    "question": "User long term goals",
+    "expected_model": "UserResearchProfile",
+    "expected_column": "long_term_goals",
+    "id": 99,
+    "category": "general"
+  },
+  {
+    "question": "Research flow session state",
+    "expected_model": "ResearchFlowSession",
+    "expected_column": "state",
+    "id": 100,
+    "category": "general"
+  },
+  {
+    "question": "User notes content",
+    "expected_model": "Note",
+    "expected_column": "content",
+    "id": 101,
+    "category": "general"
+  },
+  {
+    "question": "Notes for research projects",
+    "expected_model": "Note",
+    "expected_column": "research_id",
+    "id": 102,
+    "category": "general"
+  },
+  {
+    "question": "Notes for experiments",
+    "expected_model": "Note",
+    "expected_column": "experiment_id",
+    "id": 103,
+    "category": "general"
+  },
+  {
+    "question": "Simulation template names",
+    "expected_model": "SimulationTemplate",
+    "expected_column": "name",
+    "id": 104,
+    "category": "general"
+  },
+  {
+    "question": "Simulation template descriptions",
+    "expected_model": "SimulationTemplate",
+    "expected_column": "description",
+    "id": 105,
+    "category": "general"
+  },
+  {
+    "question": "Simulation template parameters",
+    "expected_model": "SimulationTemplate",
+    "expected_column": "parameters",
+    "id": 106,
+    "category": "general"
+  },
+  {
+    "question": "Simulation template categories",
+    "expected_model": "SimulationTemplate",
+    "expected_column": "category",
+    "id": 107,
+    "category": "general"
+  },
+  {
+    "question": "Local LLM decision run status",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "status",
+    "id": 108,
+    "category": "general"
+  },
+  {
+    "question": "Local LLM accuracy",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "accuracy",
+    "id": 109,
+    "category": "general"
+  },
+  {
+    "question": "Local LLM latency metrics",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "latency_median_ms",
+    "id": 110,
+    "category": "general"
+  }
+]

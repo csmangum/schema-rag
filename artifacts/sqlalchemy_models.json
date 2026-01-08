@@ -1,0 +1,3393 @@
+{
+  "models": [
+    {
+      "model": "AssistantRating",
+      "module": "models.assistant_rating",
+      "table": "assistant_ratings",
+      "source_file": "backend/models/assistant_rating.py",
+      "docstring": "Assistant rating model - stores user ratings for assistant responses.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "message_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "rating",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "comment",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "ix_assistant_ratings_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_assistant_ratings_message_id",
+          "columns": [
+            "message_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_assistant_ratings_simulation_id",
+          "columns": [
+            "simulation_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "AssistantStudioTrace",
+      "module": "models.assistant_studio_trace",
+      "table": "assistant_studio_traces",
+      "source_file": "backend/models/assistant_studio_trace.py",
+      "docstring": "Persistent storage for Assistant Studio traces with tool call metadata.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR(36)",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "message_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "user_message",
+          "type": "TEXT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "response_content",
+          "type": "TEXT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "system_prompt",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "context_snapshot",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "tool_calls",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "token_usage",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "timings_ms",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "validation",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "trace_metadata",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "ix_assistant_studio_traces_message_id",
+          "columns": [
+            "message_id"
+          ],
+          "unique": true
+        },
+        {
+          "name": "ix_assistant_studio_traces_simulation_id",
+          "columns": [
+            "simulation_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_assistant_studio_traces_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_astudio_trace_sim_created",
+          "columns": [
+            "simulation_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_assistant_studio_traces_created_at",
+          "columns": [
+            "created_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "UserSession",
+      "module": "models.auth",
+      "table": "user_sessions",
+      "source_file": "backend/models/auth.py",
+      "docstring": "User session model for storing OpenRouter OAuth tokens.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "api_key_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "openrouter_token_encrypted",
+          "type": "TEXT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "openrouter_token_iv",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "selected_model",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "expires_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "ix_user_sessions_api_key_id",
+          "columns": [
+            "api_key_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_user_sessions_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "model": "ChatMessage",
+      "module": "models.chat_message",
+      "table": "chat_messages",
+      "source_file": "backend/models/chat_message.py",
+      "docstring": "Chat message model - stores chat history for simulations and experiments.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "experiment_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "message_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "message_type",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "message_metadata",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_chat_message_sim_created",
+          "columns": [
+            "simulation_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_chat_messages_simulation_id",
+          "columns": [
+            "simulation_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_chat_messages_created_at",
+          "columns": [
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_chat_messages_message_id",
+          "columns": [
+            "message_id"
+          ],
+          "unique": true
+        },
+        {
+          "name": "ix_chat_messages_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_chat_message_exp_created",
+          "columns": [
+            "experiment_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_chat_message_session",
+          "columns": [
+            "session_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_chat_messages_experiment_id",
+          "columns": [
+            "experiment_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "Experiment",
+      "module": "models.experiment",
+      "table": "experiments",
+      "source_file": "backend/models/experiment.py",
+      "docstring": "Experiment model - groups related simulations for hypothesis testing.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "hypothesis",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": "draft"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "started_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "base_parameters",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "parameter_variations",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "assumptions",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "metrics",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "target_iterations",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "1"
+        },
+        {
+          "name": "completed_iterations",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "success_criteria",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "results_summary",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "research_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [
+        {
+          "name": "research",
+          "target_model": "Research",
+          "target_table": "research",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "research_id",
+              "remote_column": "id",
+              "remote_table": "research"
+            }
+          ]
+        },
+        {
+          "name": "simulations",
+          "target_model": "Simulation",
+          "target_table": "simulations",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "experiment_id",
+              "remote_table": "simulations"
+            }
+          ]
+        },
+        {
+          "name": "note_entries",
+          "target_model": "Note",
+          "target_table": "notes",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "experiment_id",
+              "remote_table": "notes"
+            }
+          ]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "model": "ExperimentSimulation",
+      "module": "models.experiment",
+      "table": "experiment_simulations",
+      "source_file": "backend/models/experiment.py",
+      "docstring": "Links experiments to simulations with iteration-specific parameters.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "default": null
+        },
+        {
+          "name": "experiment_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "iteration",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parameters_override",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "experiment",
+          "target_model": "Experiment",
+          "target_table": "experiments",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "experiment_id",
+              "remote_column": "id",
+              "remote_table": "experiments"
+            }
+          ]
+        },
+        {
+          "name": "simulation",
+          "target_model": "Simulation",
+          "target_table": "simulations",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "simulation_id",
+              "remote_column": "id",
+              "remote_table": "simulations"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_exp_sim_sim",
+          "columns": [
+            "simulation_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_exp_sim_exp_iter",
+          "columns": [
+            "experiment_id",
+            "iteration"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "Research",
+      "module": "models.research",
+      "table": "research",
+      "source_file": "backend/models/research.py",
+      "docstring": "Research model - top-level container for related experiments.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "sub_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "goals",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": "active"
+        },
+        {
+          "name": "methodology",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "methodology_structured",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "insights",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "experiments",
+          "target_model": "Experiment",
+          "target_table": "experiments",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "research_id",
+              "remote_table": "experiments"
+            }
+          ]
+        },
+        {
+          "name": "research_questions",
+          "target_model": "ResearchQuestion",
+          "target_table": "research_questions",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "research_id",
+              "remote_table": "research_questions"
+            }
+          ]
+        },
+        {
+          "name": "note_entries",
+          "target_model": "Note",
+          "target_table": "notes",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "research_id",
+              "remote_table": "notes"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_research_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_research_session_status",
+          "columns": [
+            "session_id",
+            "status"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_research_session_updated",
+          "columns": [
+            "session_id",
+            "updated_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_research_session_created",
+          "columns": [
+            "session_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_research_session_status_updated",
+          "columns": [
+            "session_id",
+            "status",
+            "updated_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "ResearchQuestion",
+      "module": "models.research",
+      "table": "research_questions",
+      "source_file": "backend/models/research.py",
+      "docstring": "Structured research question linked to research artifacts.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "research_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "prompt",
+          "type": "TEXT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "details",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "answer",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "open"
+        },
+        {
+          "name": "priority",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "related_experiment_ids",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "related_simulation_ids",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "research",
+          "target_model": "Research",
+          "target_table": "research",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "research_id",
+              "remote_column": "id",
+              "remote_table": "research"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_research_questions_research_id",
+          "columns": [
+            "research_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "ResearchFlowSession",
+      "module": "models.research_flow_session",
+      "table": "research_flow_sessions",
+      "source_file": "backend/models/research_flow_session.py",
+      "docstring": "Persistent record of an interactive research form flow.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "state",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "seed"
+        },
+        {
+          "name": "form_data",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "state_metadata",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "history",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "summary",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "completed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_research_flow_session_owner_state",
+          "columns": [
+            "session_id",
+            "state"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_research_flow_session_completed",
+          "columns": [
+            "session_id",
+            "completed_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_research_flow_sessions_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "LocalLLMDecisionRun",
+      "module": "models.local_llm_probe",
+      "table": "local_llm_decision_runs",
+      "source_file": "backend/models/local_llm_probe.py",
+      "docstring": "Persisted record for a quick-decision probe run.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "completed"
+        },
+        {
+          "name": "error",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "base_url",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "model",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "num_requests",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "concurrency",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "question_types",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "max_tokens",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "temperature",
+          "type": "FLOAT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "timeout",
+          "type": "FLOAT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "retries",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "seed",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "sample_size",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "5"
+        },
+        {
+          "name": "total_requests",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "success_count",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "failure_count",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "correct_count",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "incorrect_count",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "accuracy",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "wall_time_seconds",
+          "type": "FLOAT",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0.0"
+        },
+        {
+          "name": "throughput_total",
+          "type": "FLOAT",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0.0"
+        },
+        {
+          "name": "throughput_success",
+          "type": "FLOAT",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0.0"
+        },
+        {
+          "name": "latency_median_ms",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "latency_mean_ms",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "latency_p95_ms",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "tokens_total",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "tokens_per_sec",
+          "type": "FLOAT",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0.0"
+        },
+        {
+          "name": "avg_completion_tokens",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "categories_snapshot",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "samples",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "errors",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "completed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_local_llm_runs_created",
+          "columns": [
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_local_llm_runs_status_created",
+          "columns": [
+            "status",
+            "created_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "Simulation",
+      "module": "models.simulation",
+      "table": "simulations",
+      "source_file": "backend/models/simulation.py",
+      "docstring": "Simulation model - stores metadata about a simulation run.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": "created"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "started_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "config",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "total_steps",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "final_population",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "process_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "current_step",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "experiment_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "iteration",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [
+        {
+          "name": "simulation_config",
+          "target_model": "SimulationConfig",
+          "target_table": "simulation_configs",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "simulation_id",
+              "remote_table": "simulation_configs"
+            }
+          ]
+        },
+        {
+          "name": "experiment",
+          "target_model": "Experiment",
+          "target_table": "experiments",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "experiment_id",
+              "remote_column": "id",
+              "remote_table": "experiments"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_simulations_experiment_iteration_unique",
+          "columns": [
+            "experiment_id",
+            "iteration"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
+      "model": "SimulationConfig",
+      "module": "models.simulation",
+      "table": "simulation_configs",
+      "source_file": "backend/models/simulation.py",
+      "docstring": "Detailed simulation configuration.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parameters",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "template_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "template_version",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "simulation",
+          "target_model": "Simulation",
+          "target_table": "simulations",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "simulation_id",
+              "remote_column": "id",
+              "remote_table": "simulations"
+            }
+          ]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "model": "SimulationMetrics",
+      "module": "models.simulation",
+      "table": "simulation_metrics",
+      "source_file": "backend/models/simulation.py",
+      "docstring": "Historical metrics for each simulation step.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "step",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "timestamp",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "metrics",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_sim_metrics_sim_step",
+          "columns": [
+            "simulation_id",
+            "step"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "AgentSnapshot",
+      "module": "models.simulation",
+      "table": "agent_snapshots",
+      "source_file": "backend/models/simulation.py",
+      "docstring": "Agent positions and state at specific simulation steps.\n\n    Agent Data Format Specification:\n    --------------------------------\n    The agent_data field stores a compact JSON array of agent states to minimize storage.\n    Each agent is represented as an array with exactly 6 elements in this order:\n\n    Index | Field      | Type   | Description\n    ------|------------|--------|--------------------------------------------\n    0     | id         | string | Unique agent identifier (UUID)\n    1     | x          | float  | Agent's x-coordinate in world space\n    2     | y          | float  | Agent's y-coordinate in world space\n    3     | health     | float  | Agent's health value (0.0 - 100.0)\n    4     | resources  | float  | Agent's resource count\n    5     | age        | int    | Agent's age in simulation steps\n\n    Example format:\n    [\n        [\"agent-uuid-1\", 150.5, 200.3, 95.0, 50.0, 10],\n        [\"agent-uuid-2\", 300.2, 100.8, 80.5, 30.0, 15],\n        ...\n    ]\n\n    IMPORTANT: This format must remain stable. Any changes to the array structure\n    require a database migration and updates to serialization/deserialization code.\n    ",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "step",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "timestamp",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "agent_data",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_agent_snapshot_sim_step",
+          "columns": [
+            "simulation_id",
+            "step"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "AgentIntrospection",
+      "module": "models.simulation",
+      "table": "agent_introspection",
+      "source_file": "backend/models/simulation.py",
+      "docstring": "Extended agent introspection data for deep analysis.\n\n    Stores detailed cognitive state, memory, policy, and attention data\n    for individual agents at specific simulation steps.\n    ",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "agent_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "step",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "timestamp",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "position_x",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "position_y",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "health",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "resources",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "age",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "memory_state",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "policy_state",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "attention",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_agent_introspection_sim_agent_step",
+          "columns": [
+            "simulation_id",
+            "agent_id",
+            "step"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "AgentLineage",
+      "module": "models.simulation",
+      "table": "agent_lineage",
+      "source_file": "backend/models/simulation.py",
+      "docstring": "Agent lineage and genetic tracking for evolutionary analysis.\n\n    Tracks parent-child relationships, genetic parameters, and mutations\n    to enable family tree visualization and evolutionary analysis.\n    ",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": true,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "agent_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parent_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "birth_step",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "death_step",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "metabolism_rate",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "max_health",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "max_resources",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "mutations",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_lineage_birth_step",
+          "columns": [
+            "simulation_id",
+            "birth_step"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_lineage_parent",
+          "columns": [
+            "simulation_id",
+            "parent_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_lineage_sim_agent",
+          "columns": [
+            "simulation_id",
+            "agent_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "SimulationTemplate",
+      "module": "models.template",
+      "table": "simulation_templates",
+      "source_file": "backend/models/template.py",
+      "docstring": "Simulation template model - stores reusable simulation configurations.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parameters",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": "custom"
+        }
+      ],
+      "relationships": [],
+      "indexes": []
+    },
+    {
+      "model": "Program",
+      "module": "models.program",
+      "table": "programs",
+      "source_file": "backend/models/program.py",
+      "docstring": "Simulation program model - stores executable simulation programs.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "parameters",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "script_file",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "inline_code",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "output_schema",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "post_processing_config",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": "custom"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "variants",
+          "target_model": "ProgramVariant",
+          "target_table": "program_variants",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "program_id",
+              "remote_table": "program_variants"
+            }
+          ]
+        },
+        {
+          "name": "statistics",
+          "target_model": "ProgramStatistics",
+          "target_table": "program_statistics",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "program_id",
+              "remote_table": "program_statistics"
+            }
+          ]
+        },
+        {
+          "name": "executions",
+          "target_model": "ProgramExecution",
+          "target_table": "program_executions",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "program_id",
+              "remote_table": "program_executions"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_programs_category_created",
+          "columns": [
+            "category",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_programs_name",
+          "columns": [
+            "name"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "ProgramVariant",
+      "module": "models.program",
+      "table": "program_variants",
+      "source_file": "backend/models/program.py",
+      "docstring": "Program variant model - stores named modifications of programs.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "program_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parameter_overrides",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "code_overrides",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "post_processing_overrides",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "program",
+          "target_model": "Program",
+          "target_table": "programs",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "program_id",
+              "remote_column": "id",
+              "remote_table": "programs"
+            }
+          ]
+        },
+        {
+          "name": "statistics",
+          "target_model": "ProgramStatistics",
+          "target_table": "program_statistics",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "variant_id",
+              "remote_table": "program_statistics"
+            }
+          ]
+        },
+        {
+          "name": "executions",
+          "target_model": "ProgramExecution",
+          "target_table": "program_executions",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "variant_id",
+              "remote_table": "program_executions"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_program_variants_program_created",
+          "columns": [
+            "program_id",
+            "created_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "ProgramStatistics",
+      "module": "models.program",
+      "table": "program_statistics",
+      "source_file": "backend/models/program.py",
+      "docstring": "Program statistics model - tracks aggregated usage and performance metrics.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "program_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "variant_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "usage_count",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "success_count",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "failure_count",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "avg_execution_time",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "avg_memory_usage",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "output_metrics",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parameter_stats",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "last_used_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "program",
+          "target_model": "Program",
+          "target_table": "programs",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "program_id",
+              "remote_column": "id",
+              "remote_table": "programs"
+            }
+          ]
+        },
+        {
+          "name": "variant",
+          "target_model": "ProgramVariant",
+          "target_table": "program_variants",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "variant_id",
+              "remote_column": "id",
+              "remote_table": "program_variants"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_program_stats_program_variant",
+          "columns": [
+            "program_id",
+            "variant_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_program_stats_updated",
+          "columns": [
+            "updated_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "ProgramExecution",
+      "module": "models.program",
+      "table": "program_executions",
+      "source_file": "backend/models/program.py",
+      "docstring": "Program execution model - records individual program execution instances.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "program_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "variant_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "parameters",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "execution_time",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "memory_usage",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "success",
+          "type": "INTEGER",
+          "nullable": true,
+          "primary_key": false,
+          "default": "1"
+        },
+        {
+          "name": "error_message",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "output_data",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "post_processed_output",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "executed_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "program",
+          "target_model": "Program",
+          "target_table": "programs",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "program_id",
+              "remote_column": "id",
+              "remote_table": "programs"
+            }
+          ]
+        },
+        {
+          "name": "variant",
+          "target_model": "ProgramVariant",
+          "target_table": "program_variants",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "variant_id",
+              "remote_column": "id",
+              "remote_table": "program_variants"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_program_exec_simulation",
+          "columns": [
+            "simulation_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_program_exec_program_executed",
+          "columns": [
+            "program_id",
+            "executed_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_program_exec_variant_executed",
+          "columns": [
+            "variant_id",
+            "executed_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_program_exec_success_executed",
+          "columns": [
+            "success",
+            "executed_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "MetricDefinition",
+      "module": "models.metric_definition",
+      "table": "metric_definitions",
+      "source_file": "backend/models/metric_definition.py",
+      "docstring": "Metric definition record.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "key",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "custom"
+        },
+        {
+          "name": "format",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "number"
+        },
+        {
+          "name": "color_scheme",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "blue"
+        },
+        {
+          "name": "unit",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "priority",
+          "type": "INTEGER",
+          "nullable": false,
+          "primary_key": false,
+          "default": "0"
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "threshold",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "compute_spec",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "is_chart",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "primary_key": false,
+          "default": "False"
+        },
+        {
+          "name": "is_active",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "primary_key": false,
+          "default": "True"
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "tag_objects",
+          "target_model": "MetricTag",
+          "target_table": "metric_tags",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "metric_definition_id",
+              "remote_table": "metric_definition_tags"
+            },
+            {
+              "local_column": "id",
+              "remote_column": "tag_id",
+              "remote_table": "metric_definition_tags"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_metric_definitions_key",
+          "columns": [
+            "key"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_metric_definitions_label",
+          "columns": [
+            "label"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_metric_definitions_category",
+          "columns": [
+            "category"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "MetricTag",
+      "module": "models.metric_tag",
+      "table": "metric_tags",
+      "source_file": "backend/models/metric_tag.py",
+      "docstring": "Tag record for metric definitions.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        }
+      ],
+      "relationships": [
+        {
+          "name": "metrics",
+          "target_model": "MetricDefinition",
+          "target_table": "metric_definitions",
+          "uselist": true,
+          "join_pairs": [
+            {
+              "local_column": "id",
+              "remote_column": "tag_id",
+              "remote_table": "metric_definition_tags"
+            },
+            {
+              "local_column": "id",
+              "remote_column": "metric_definition_id",
+              "remote_table": "metric_definition_tags"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_metric_tags_name",
+          "columns": [
+            "name"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "Note",
+      "module": "models.note",
+      "table": "notes",
+      "source_file": "backend/models/note.py",
+      "docstring": "A minimal user-scoped note with optional research/experiment context.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "research_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "experiment_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "research",
+          "target_model": "Research",
+          "target_table": "research",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "research_id",
+              "remote_column": "id",
+              "remote_table": "research"
+            }
+          ]
+        },
+        {
+          "name": "experiment",
+          "target_model": "Experiment",
+          "target_table": "experiments",
+          "uselist": false,
+          "join_pairs": [
+            {
+              "local_column": "experiment_id",
+              "remote_column": "id",
+              "remote_table": "experiments"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_notes_session_created",
+          "columns": [
+            "session_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_notes_research_created",
+          "columns": [
+            "research_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_notes_experiment_created",
+          "columns": [
+            "experiment_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_notes_session_updated",
+          "columns": [
+            "session_id",
+            "updated_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "ToolTelemetryEvent",
+      "module": "models.tool_telemetry",
+      "table": "tool_telemetry_events",
+      "source_file": "backend/models/tool_telemetry.py",
+      "docstring": "Tool telemetry event model - tracks tool invocations for metrics.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "tool_name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "simulation_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "experiment_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "start_timestamp",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "end_timestamp",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "duration_ms",
+          "type": "FLOAT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "success",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "error_message",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "JSON",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_tool_telemetry_sim_created",
+          "columns": [
+            "simulation_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_tool_telemetry_exp_created",
+          "columns": [
+            "experiment_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_tool_telemetry_session_created",
+          "columns": [
+            "session_id",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_tool_telemetry_success_created",
+          "columns": [
+            "success",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_tool_telemetry_tool_created",
+          "columns": [
+            "tool_name",
+            "created_at"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "UserResearchEvent",
+      "module": "models.user_research_event",
+      "table": "user_research_events",
+      "source_file": "backend/models/user_research_event.py",
+      "docstring": "Individual event in the local user's research history timeline.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "session_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "event_type",
+          "type": "VARCHAR(128)",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR(64)",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "entity_type",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "entity_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "importance",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "info"
+        },
+        {
+          "name": "tags",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "metadata",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "dict"
+        },
+        {
+          "name": "occurred_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "pinned_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "is_system_generated",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "primary_key": false,
+          "default": "True"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": false,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "idx_user_research_events_session_pinned",
+          "columns": [
+            "session_id",
+            "pinned_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_user_research_events_session_occurred",
+          "columns": [
+            "session_id",
+            "occurred_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_user_research_events_session_id",
+          "columns": [
+            "session_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_user_research_events_entity",
+          "columns": [
+            "entity_type",
+            "entity_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
+      "model": "UserResearchProfile",
+      "module": "models.user_research_profile",
+      "table": "user_research_profiles",
+      "source_file": "backend/models/user_research_profile.py",
+      "docstring": "Research profile describing the local user's goals and preferences.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": true,
+          "default": "generate_uuid"
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "last_session_id",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "display_name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "primary_key": false,
+          "default": "Local Researcher"
+        },
+        {
+          "name": "role",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "organization",
+          "type": "VARCHAR",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "background",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "research_interests",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "current_focus",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "short_term_goals",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "long_term_goals",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "preferred_modalities",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "collaboration_style",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "success_indicators",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "support_needs",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "knowledge_assets",
+          "type": "JSON",
+          "nullable": false,
+          "primary_key": false,
+          "default": "list"
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        },
+        {
+          "name": "updated_at",
+          "type": "DATETIME",
+          "nullable": true,
+          "primary_key": false,
+          "default": "utc_now"
+        }
+      ],
+      "relationships": [],
+      "indexes": [
+        {
+          "name": "ix_user_research_profiles_user_id",
+          "columns": [
+            "user_id"
+          ],
+          "unique": true
+        }
+      ]
+    }
+  ],
+  "total_models": 27
+}
