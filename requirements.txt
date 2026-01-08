@@ -4,5 +4,9 @@
 faiss-cpu>=1.7.4
 sentence-transformers>=2.2.0
 
+# Testing dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
 # Optional: For SQLAlchemy model export (if using export script)
 # sqlalchemy>=2.0.0
