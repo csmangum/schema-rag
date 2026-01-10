@@ -201,6 +201,100 @@ class SchemaRagService:
         
         return boost
     
+    def _exact_match_boost(self, doc: Dict[str, Any], query_keywords: List[str]) -> float:
+        """Boost for exact model+column matches."""
+        boost = 0.0
+        metadata = doc.get("metadata", {})
+        col_name = (metadata.get("column") or "").lower()
+        model_name = (metadata.get("model") or "").lower()
+        
+        # Check if both model and column have keyword matches
+        model_match = any(kw in model_name for kw in query_keywords)
+        col_match = any(kw in col_name for kw in query_keywords)
+        
+        if model_match and col_match:
+            boost += 6.0  # Strong boost for exact model+column match
+        
+        return boost
+    
+    def _recipe_pattern_boost(self, doc: Dict[str, Any], question: str, entities: Dict[str, Any]) -> float:
+        """Boost query recipes that match expected patterns."""
+        boost = 0.0
+        
+        if doc.get("doc_type") != "query_recipe":
+            return boost
+        
+        metadata = doc.get("metadata", {})
+        question_lower = question.lower()
+        
+        # Boost curated recipes
+        if metadata.get("source") == "curated":
+            boost += 4.0
+        
+        # Pattern-based boosts
+        recipe_type = metadata.get("recipe_type", "")
+        
+        # Aggregation patterns
+        if recipe_type == "aggregation":
+            if any(term in question_lower for term in ["how many", "count", "total", "sum", "average", "avg"]):
+                boost += 2.0
+        
+        # Temporal patterns
+        if recipe_type == "temporal":
+            if entities.get("has_date") or any(term in question_lower for term in ["recent", "last", "created", "updated", "year"]):
+                boost += 2.0
+        
+        # Status patterns
+        if recipe_type == "status":
+            if any(term in question_lower for term in ["running", "completed", "active", "status", "state"]):
+                boost += 2.0
+        
+        # Relationship patterns
+        if recipe_type == "relationship":
+            if any(term in question_lower for term in ["related", "linked", "for", "associated", "connection"]):
+                boost += 2.0
+        
+        return boost
+    
+    def _penalize_incorrect_matches(self, doc: Dict[str, Any], query_keywords: List[str], vector_score: float) -> float:
+        """Apply negative scoring for clearly incorrect matches."""
+        penalty = 0.0
+        metadata = doc.get("metadata", {})
+        
+        model_name = (metadata.get("model") or "").lower()
+        col_name = (metadata.get("column") or "").lower()
+        table_name = (metadata.get("table") or "").lower()
+        
+        # Check for any keyword matches
+        has_model_match = any(kw in model_name for kw in query_keywords)
+        has_col_match = any(kw in col_name for kw in query_keywords)
+        has_table_match = any(kw in table_name for kw in query_keywords)
+        has_text_match = any(kw in doc.get("text", "").lower() for kw in query_keywords)
+        
+        # Penalize if no matches at all AND low vector score
+        if not (has_model_match or has_col_match or has_table_match or has_text_match):
+            if vector_score < 0.3:
+                penalty -= 3.0  # Strong penalty for low similarity + no keyword matches
+        
+        # Penalize domain mismatches (heuristic: if query has strong domain keyword but doc doesn't)
+        domain_keywords = {
+            "program": ["program", "programs"],
+            "simulation": ["simulation", "simulations"],
+            "experiment": ["experiment", "experiments"],
+            "research": ["research"],
+        }
+        
+        for domain, keywords in domain_keywords.items():
+            query_has_domain = any(kw in query_keywords for kw in keywords)
+            doc_has_domain = any(kw in model_name or kw in table_name for kw in keywords)
+            
+            if query_has_domain and not doc_has_domain:
+                # Only penalize if vector score is also low
+                if vector_score < 0.4:
+                    penalty -= 2.0
+        
+        return penalty
+    
     def _extract_entities(self, question: str) -> Dict[str, Any]:
         """Extract entities from question with improved patterns."""
         entities = {}
@@ -370,11 +464,24 @@ class SchemaRagService:
             
             # Apply lexical boost
             lexical_boost = self._lexical_boost(doc, query_keywords)
-            final_score = vector_score + lexical_boost
+            
+            # Exact model+column match boost
+            exact_match_boost = self._exact_match_boost(doc, query_keywords)
+            
+            # Recipe pattern boost
+            recipe_boost = self._recipe_pattern_boost(doc, question, entities)
+            
+            # Penalty for incorrect matches
+            penalty = self._penalize_incorrect_matches(doc, query_keywords, vector_score)
+            
+            final_score = vector_score + lexical_boost + exact_match_boost + recipe_boost - abs(penalty)
             
             doc["score"] = float(final_score)
             doc["vector_score"] = float(vector_score)
             doc["lexical_boost"] = float(lexical_boost)
+            doc["exact_match_boost"] = float(exact_match_boost)
+            doc["recipe_boost"] = float(recipe_boost)
+            doc["penalty"] = float(penalty)
             scored_docs.append(doc)
         
         # Apply entity-based boosting
