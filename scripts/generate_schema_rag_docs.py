@@ -115,7 +115,6 @@ def describe_column_purpose(column: Dict[str, Any], model: Dict[str, Any]) -> st
 def get_example_queries_for_model(model: Dict[str, Any]) -> List[str]:
     """Generate example natural language queries that would match this model."""
     model_name = model["model"]
-    table_name = model["table"]
     model_name_lower = model_name.lower().replace("_", " ")
     
     examples = []
@@ -407,7 +406,6 @@ def generate_model_text(model: Dict[str, Any]) -> str:
         for rel in model["relationships"]:
             rel_name = rel.get("name", "")
             target_model = rel.get("target_model", "")
-            target_table = rel.get("target_table", "")
             join_pairs = rel.get("join_pairs", [])
             
             if target_model and join_pairs:
@@ -534,7 +532,6 @@ def generate_relationship_recipes(
         # Generate recipe for forward relationship
         join_hints = []
         for pair in join_pairs:
-            local_table = table_name
             remote_table = pair.get('remote_table', target_table)
             join_hints.append(
                 f"{table_name}.{pair['local_column']} -> {remote_table}.{pair['remote_column']}"
@@ -845,7 +842,6 @@ def generate_status_recipes(
     """Generate recipes for status/enum filtering queries."""
     recipes = []
     col_name = column["name"]
-    col_type = column["type"].lower()
     table_name = model["table"]
     model_name = model["model"]
     
@@ -906,7 +902,7 @@ def generate_status_recipes(
             "join_hints": [],
             "keywords": sorted(set(keywords)),
             "semantics": "Count by status",
-        "recipe_type": "status",
+            "recipe_type": "status",
         },
     })
     

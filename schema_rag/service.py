@@ -133,22 +133,28 @@ class SchemaRagService:
         i = 0
         while i < len(words):
             word = words[i]
-            expanded.append(word)
             
-            # Check for exact word match
-            if word in synonyms:
-                expanded.extend(synonyms[word])
-            
-            # Check for multi-word phrases (2-4 words) starting at current position
+            # Check for multi-word phrases (2-4 words) starting at current position FIRST
+            phrase_matched = False
             for phrase_len in range(2, min(5, len(words) - i + 1)):
                 phrase = " ".join(words[i:i + phrase_len])
                 if phrase in synonyms:
+                    expanded.append(word)  # Add the first word
                     expanded.extend(synonyms[phrase])
-                    # Skip words that are part of matched phrase
-                    i += phrase_len - 1
+                    # Skip all words that are part of matched phrase
+                    i += phrase_len
+                    phrase_matched = True
                     break
             
-            i += 1
+            if not phrase_matched:
+                # No phrase match, process word individually
+                expanded.append(word)
+                
+                # Check for exact word match
+                if word in synonyms:
+                    expanded.extend(synonyms[word])
+                
+                i += 1
         
         return " ".join(expanded)
     
