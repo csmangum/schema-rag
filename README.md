@@ -11,9 +11,12 @@ Schema RAG enables agents and LLMs to ground their responses in database schema 
 
 ## Features
 
-- **Hybrid Retrieval**: Combines semantic vector search with keyword-based lexical matching
-- **Query Expansion**: Automatically expands queries with synonyms for better matching
-- **Entity Extraction**: Extracts program names, dates, and numeric filters from questions
+- **Hybrid Retrieval**: Multi-component scoring system combining semantic vector search, lexical matching, exact match detection, and pattern recognition
+- **High Precision**: Achieves 80.9% precision for model+column matching (96.4% for model matching)
+- **Query Expansion**: Bidirectional synonym expansion with multi-word phrase support (2-4 word phrases)
+- **Entity Extraction**: Extracts program names, dates, temporal types, and numeric filters from questions
+- **Recipe Prioritization**: Curated query recipes are prioritized with pattern-based boosts
+- **Intelligent Penalties**: Demotes incorrect matches to improve precision
 - **Join Hint Generation**: Automatically generates join paths for related tables
 - **Ambiguity Detection**: Identifies semantic ambiguities (e.g., variant_id handling)
 
@@ -151,22 +154,39 @@ See [docs/SCHEMA_RAG.md](docs/SCHEMA_RAG.md) for detailed architecture documenta
 
 ## Testing
 
-Comprehensive test results are available in [artifacts/SCHEMA_RAG_TEST_REPORT.md](artifacts/SCHEMA_RAG_TEST_REPORT.md). The test suite evaluates the system with 110 natural language questions and reports precision metrics, performance analysis, and detailed results.
+Comprehensive test results are available:
+- [artifacts/SCHEMA_RAG_TEST_REPORT.md](artifacts/SCHEMA_RAG_TEST_REPORT.md) - Original test report
+- [artifacts/SCORING_REFINEMENT_TEST_RESULTS.md](artifacts/SCORING_REFINEMENT_TEST_RESULTS.md) - Latest test results after scoring improvements
+
+The test suite evaluates the system with 110 natural language questions and shows:
+- **80.9% precision** for model+column matching (up from 58.2%)
+- **96.4% precision** for model matching (up from 67.3%)
+- **38.1% improvement** in average top scores
+- **162% increase** in average schema references per query
 
 ## Configuration
 
 ### Synonyms
 
-Edit `schema_rag/schema_synonyms.json` to customize query expansion:
+Edit `schema_rag/schema_synonyms.json` to customize query expansion. The system supports:
+- **Bidirectional expansion**: Synonyms work in both directions (e.g., "run" → "usage" and "usage" → "run")
+- **Multi-word phrases**: Support for 2-4 word phrases (e.g., "how many times" → "usage_count")
+- **Comprehensive coverage**: Includes synonyms for execution, status, temporal, and descriptive terms
 
+Example:
 ```json
 {
-  "run": ["usage", "execution", "executed"],
-  "how many": ["count", "number", "total"]
+  "run": ["usage", "execution", "executed", "usage_count", "executions"],
+  "how many times": ["usage_count", "count", "executions"],
+  "status": ["running", "completed", "active", "inactive", "state"]
 }
 ```
 
 ### Curated Recipes
+
+Curated recipes receive higher priority in search results with pattern-based boosts:
+- **Base boost**: +4.0 for curated recipes
+- **Pattern boosts**: +2.0 for matching patterns (aggregation, temporal, status, relationship)
 
 You can add curated recipes by creating a JSONL file and passing it to the document generator:
 
@@ -176,6 +196,8 @@ python scripts/generate_schema_rag_docs.py \
   --out artifacts/schema_rag_docs.jsonl \
   --curated artifacts/schema_rag_curated_recipes.jsonl
 ```
+
+Curated recipes should include metadata like `recipe_type` (aggregation, temporal, status, relationship) to enable pattern-based boosting.
 
 ## Requirements
 

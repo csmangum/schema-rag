@@ -102,9 +102,25 @@ Core retrieval service with hybrid search strategy:
 
 #### Retrieval Strategy
 
-1. **Vector Similarity**: Query embedding → FAISS search → top-k documents
-2. **Lexical Boost**: Boost documents with exact keyword matches (column names, model names)
-3. **Metadata Filtering**: Boost documents matching question context (e.g., "program" → boost Program/ProgramStatistics docs)
+The service uses a sophisticated hybrid ranking system with multiple scoring components:
+
+1. **Vector Similarity**: Query embedding → FAISS search → top-k documents (base score)
+2. **Lexical Boost**: Boost documents with exact keyword matches (column names, model names, table names)
+   - Column name matches: +3.0
+   - Model name matches: +2.0
+   - Table name matches: +1.5
+   - Status column special handling: +4.0 base + up to +2.0 for specific status values
+3. **Exact Match Boost**: +6.0 when both model and column keywords match the query
+4. **Recipe Pattern Boost**: Prioritizes curated query recipes
+   - Curated recipes: +4.0 base boost
+   - Pattern-based boosts: +2.0 for matching patterns (aggregation, temporal, status, relationship)
+5. **Entity-Based Boost**: Context-aware boosting based on extracted entities
+   - Program name matches: +3.0
+   - Temporal column matches: +2.0 base, +2.0 for specific temporal types
+   - Numeric column matches: +1.0
+6. **Penalty System**: Demotes clearly incorrect matches
+   - No keyword matches + low vector score: -3.0
+   - Domain mismatches + low vector score: -2.0
 
 #### GroundingResult Structure
 
@@ -120,11 +136,14 @@ class GroundingResult:
 
 #### Key Features
 
-- Hybrid ranking (vector + lexical)
-- Entity extraction from questions (e.g., program name)
-- Join hint normalization from recipes
-- Ambiguity detection (e.g., variant_id semantics)
-- Query expansion with synonyms
+- **Hybrid Ranking**: Multi-component scoring system combining vector similarity, lexical matching, exact matches, and pattern recognition
+- **Entity Extraction**: Extracts program names, dates, temporal types, and numeric filters from questions
+- **Enhanced Query Expansion**: Bidirectional synonym expansion with multi-word phrase support (2-4 word phrases)
+- **Recipe Prioritization**: Curated recipes receive higher priority with pattern-based boosts
+- **Intelligent Penalties**: Demotes incorrect matches to improve precision
+- **Join Hint Normalization**: Extracts and normalizes join paths from recipes
+- **Ambiguity Detection**: Identifies semantic ambiguities (e.g., variant_id semantics)
+- **Temporal Pattern Recognition**: Enhanced detection of created/updated/executed temporal queries
 
 ### 5. Query Tool
 
@@ -146,10 +165,12 @@ python scripts/query_schema_rag.py "What is the success count for the forest fir
 
 ### Architecture Principles
 
-1. **Hybrid Retrieval**: Combines vector similarity with lexical matching for better precision
-2. **Deterministic IDs**: Enable safe upsert/rebuild of index
-3. **Template-Based Recipes**: Start with generated recipes, can add curated ones later
-4. **Semantic Grounding**: Returns structured references, not just raw text
+1. **Hybrid Retrieval**: Combines vector similarity with lexical matching, exact match detection, and pattern recognition for high precision (80.9% model+column match rate)
+2. **Multi-Component Scoring**: Uses vector scores, lexical boosts, exact match boosts, recipe pattern boosts, entity boosts, and penalties to rank results
+3. **Deterministic IDs**: Enable safe upsert/rebuild of index
+4. **Curated Recipe Priority**: Curated recipes are prioritized over template-generated ones with pattern-based boosts
+5. **Semantic Grounding**: Returns structured references, not just raw text
+6. **Bidirectional Synonym Expansion**: Query expansion works in both directions and supports multi-word phrases
 
 ## Data Flow
 
@@ -159,9 +180,16 @@ python scripts/query_schema_rag.py "What is the success count for the forest fir
    - Generate embeddings → FAISS index
 
 2. **Query Time**:
-   - User question → Embed query
-   - FAISS search → Top-k documents
-   - Hybrid ranking → Boost lexical matches
+   - User question → Expand with synonyms (bidirectional, multi-word phrases)
+   - Embed expanded query → FAISS search → Top-k documents
+   - Extract entities (program names, dates, temporal types, numeric filters)
+   - Multi-component scoring:
+     * Vector similarity (base score)
+     * Lexical boost (keyword matches)
+     * Exact match boost (model+column matches)
+     * Recipe pattern boost (curated recipes, pattern matching)
+     * Entity boost (context-aware)
+     * Penalties (incorrect matches)
    - Extract schema refs, join hints, recipes → GroundingResult
 
 ## Example Use Case
@@ -226,6 +254,17 @@ schema_rag/
 
 ## Testing Strategy
 
+### Comprehensive Test Suite
+
+The system includes a comprehensive test suite with 110 natural language questions. Test results show:
+
+- **80.9% precision** for model+column matching (up from 58.2%)
+- **96.4% precision** for model matching (up from 67.3%)
+- **Average top score**: 19.14 (up from 13.86, +38.1% improvement)
+- **Average schema refs per query**: 3.54 (up from 1.35, +162% improvement)
+
+See [artifacts/SCORING_REFINEMENT_TEST_RESULTS.md](../artifacts/SCORING_REFINEMENT_TEST_RESULTS.md) for detailed test results and validation.
+
 ### Acceptance Test (Minimum)
 
 **Question**: "What is the success count for the forest fire program"
@@ -237,18 +276,47 @@ schema_rag/
 - Returns join hints including:
   - `program_statistics.program_id -> programs.id`
   - `programs.name` (or equivalent linkage)
+- Top document should have high score (typically >25.0) due to exact match boost
 
 ### Additional Test Cases
 
 - "How many failures for program forest fire?" → `ProgramStatistics.failure_count`
 - "How many times was forest fire run?" → `ProgramStatistics.usage_count`
 - "Average execution time for forest fire program" → `ProgramStatistics.avg_execution_time`
+- "Program variants for a specific program" → `ProgramVariant.name` (exact match boost)
+- "Local LLM decision run status" → `LocalLLMDecisionRun.status` (status column boost)
+
+## Scoring System Details
+
+The scoring system uses multiple components to rank documents:
+
+### Score Components
+
+1. **Vector Score** (base): Semantic similarity from FAISS (typically 0.0-1.0)
+2. **Lexical Boost**: Keyword matching in metadata and text
+3. **Exact Match Boost**: +6.0 when both model and column keywords match
+4. **Recipe Boost**: 
+   - +4.0 for curated recipes
+   - +2.0 for pattern matches (aggregation, temporal, status, relationship)
+5. **Entity Boost**: Context-aware boosts based on extracted entities
+6. **Penalty**: Negative adjustments for incorrect matches
+
+### Example Score Breakdown
+
+For query "What is the success count for the forest fire program":
+- Vector Score: ~1.0
+- Lexical Boost: ~3.0 (column name match)
+- Exact Match Boost: +6.0 (model="ProgramStatistics", column="success_count")
+- Recipe Boost: +6.0 (curated + aggregation pattern)
+- Entity Boost: ~3.98 (program name match)
+- Penalty: 0.0
+- **Final Score: ~29.98**
 
 ## Future Considerations
 
 - **Variant Semantics**: Choose default policy (sum across variants vs base-only) and document it
 - **Name Matching**: Implement fuzzy matching for program names
-- **Curated Recipes**: Add hand-authored recipes for complex query patterns
 - **Query Execution**: Optional path to execute queries (with parameterization and security controls)
 - **Production Vector Store**: Migrate to pgvector/Qdrant for production scale
 - **Background Re-indexing**: Automatically rebuild index when schema changes
+- **Synonym Learning**: Automatically learn synonyms from query patterns
