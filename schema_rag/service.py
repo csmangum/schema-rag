@@ -178,7 +178,7 @@ class SchemaRagService:
         table_name = doc.get("metadata", {}).get("table", "")
         
         # Status column boosting
-        if has_status_keyword and col_name.lower() == "status":
+        if has_status_keyword and col_name and col_name.lower() == "status":
             boost += 4.0  # Very strong boost for status column when status keywords present
             # Additional boost for exact status value matches in query
             for qkw in query_keywords:
@@ -186,11 +186,11 @@ class SchemaRagService:
                     boost += 2.0  # Extra boost for specific status values
         
         for qkw in query_keywords:
-            if qkw in col_name.lower():
+            if col_name and qkw in col_name.lower():
                 boost += 3.0  # Very strong boost for column name match
-            if qkw in model_name.lower():
+            if model_name and qkw in model_name.lower():
                 boost += 2.0
-            if qkw in table_name.lower():
+            if table_name and qkw in table_name.lower():
                 boost += 1.5
         
         # Check doc text for exact matches
@@ -292,30 +292,31 @@ class SchemaRagService:
             
             # Enhanced temporal column boosting
             if entities.get("has_date"):
-                col_name = metadata.get("column", "").lower()
+                col_name = (metadata.get("column") or "").lower()
                 temporal_type = entities.get("temporal_type", "")
                 
                 # Boost all temporal columns
-                if any(term in col_name for term in ["date", "time", "at", "created", "updated", "executed", "modified"]):
+                if col_name and any(term in col_name for term in ["date", "time", "at", "created", "updated", "executed", "modified"]):
                     boost += 2.0  # Increased from 1.5
                 
                 # Stronger boost for specific temporal types
-                if temporal_type == "created" and "created" in col_name:
-                    boost += 2.0
-                elif temporal_type == "updated" and ("updated" in col_name or "modified" in col_name or "last_used" in col_name):
-                    boost += 2.0
-                elif temporal_type == "executed" and "executed" in col_name:
-                    boost += 2.0
+                if col_name:
+                    if temporal_type == "created" and "created" in col_name:
+                        boost += 2.0
+                    elif temporal_type == "updated" and ("updated" in col_name or "modified" in col_name or "last_used" in col_name):
+                        boost += 2.0
+                    elif temporal_type == "executed" and "executed" in col_name:
+                        boost += 2.0
                 
                 # Boost for year patterns (e.g., "created in 2024")
                 if re.search(r'\d{4}', doc.get("text", "")):
-                    if any(term in col_name for term in ["created", "updated", "date", "at"]):
+                    if col_name and any(term in col_name for term in ["created", "updated", "date", "at"]):
                         boost += 1.5
             
             # Boost numeric columns if numeric filters present
             if "min_value" in entities or "max_value" in entities:
-                col_name = metadata.get("column", "").lower()
-                if any(term in col_name for term in ["count", "total", "sum", "avg", "average"]):
+                col_name = (metadata.get("column") or "").lower()
+                if col_name and any(term in col_name for term in ["count", "total", "sum", "avg", "average"]):
                     boost += 1.0
             
             if boost > 0:
@@ -408,6 +409,14 @@ class SchemaRagService:
                     "join_hints": metadata.get("join_hints", []),
                 })
                 join_hints.extend(metadata.get("join_hints", []))
+                # Also extract schema_refs from recipes that have model/column metadata
+                if metadata.get("model") and metadata.get("column"):
+                    schema_refs.append({
+                        "model": metadata.get("model"),
+                        "table": metadata.get("table"),
+                        "column": metadata.get("column"),
+                        "source_file": metadata.get("source_file"),
+                    })
             
             # Extract join hints from any document
             if "join_hints" in metadata:
