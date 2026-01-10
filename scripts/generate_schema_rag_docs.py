@@ -52,6 +52,217 @@ def extract_keywords(text: str) -> List[str]:
     return sorted(keywords)
 
 
+def get_key_columns(model: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Extract key columns from a model (count columns, name columns, status columns, foreign keys)."""
+    key_cols = []
+    for col in model.get("columns", []):
+        col_name = col["name"].lower()
+        if (
+            col_name.endswith("_count")
+            or "name" in col_name
+            or "status" in col_name
+            or "state" in col_name
+            or col_name.endswith("_id")
+            or "created_at" in col_name
+            or "updated_at" in col_name
+        ):
+            key_cols.append(col)
+    return key_cols
+
+
+def describe_column_purpose(column: Dict[str, Any], model: Dict[str, Any]) -> str:
+    """Generate a natural language description of a column's purpose."""
+    col_name = column["name"]
+    col_name_lower = col_name.lower()
+    
+    descriptions = []
+    
+    if col_name.endswith("_count"):
+        base_name = col_name[:-6].replace("_", " ")
+        descriptions.append(f"number of {base_name}")
+    elif col_name.endswith("_id"):
+        if "foreign_keys" in column:
+            for fk in column["foreign_keys"]:
+                target_table = fk.get("target_table", "").replace("_", " ")
+                descriptions.append(f"identifier linking to {target_table}")
+        else:
+            descriptions.append("identifier")
+    elif "name" in col_name_lower:
+        descriptions.append("name or label for identification")
+    elif "description" in col_name_lower:
+        descriptions.append("descriptive text or details")
+    elif "status" in col_name_lower or "state" in col_name_lower:
+        descriptions.append("current status or state")
+    elif "created_at" in col_name_lower:
+        descriptions.append("timestamp when record was created")
+    elif "updated_at" in col_name_lower:
+        descriptions.append("timestamp when record was last updated")
+    elif "time" in col_name_lower:
+        if "avg" in col_name_lower or "average" in col_name_lower:
+            descriptions.append("average execution or processing time")
+        else:
+            descriptions.append("timestamp or duration")
+    elif "success" in col_name_lower:
+        descriptions.append("number of successful operations")
+    elif "failure" in col_name_lower:
+        descriptions.append("number of failed operations")
+    elif "usage" in col_name_lower:
+        descriptions.append("usage count or frequency")
+    
+    return descriptions[0] if descriptions else "data field"
+
+
+def get_example_queries_for_model(model: Dict[str, Any]) -> List[str]:
+    """Generate example natural language queries that would match this model."""
+    model_name = model["model"]
+    table_name = model["table"]
+    model_name_lower = model_name.lower().replace("_", " ")
+    
+    examples = []
+    
+    # Find key columns
+    name_col = next((c for c in model["columns"] if "name" in c["name"].lower()), None)
+    count_cols = [c for c in model["columns"] if c["name"].endswith("_count")]
+    status_col = next((c for c in model["columns"] if "status" in c["name"].lower() or "state" in c["name"].lower()), None)
+    
+    # Generate examples based on model type and columns
+    if "statistics" in model_name_lower or "stats" in model_name_lower:
+        if name_col:
+            examples.append(f"{model_name_lower} for {name_col['name'].replace('_', ' ')}")
+        if count_cols:
+            for col in count_cols[:2]:  # Limit to first 2
+                base = col["name"].replace("_count", "").replace("_", " ")
+                examples.append(f"{base} count for {model_name_lower.replace('statistics', '').strip()}")
+                examples.append(f"how many {base} for {model_name_lower.replace('statistics', '').strip()}")
+    elif "program" in model_name_lower:
+        examples.append(f"{model_name_lower} information")
+        examples.append(f"{model_name_lower} details")
+        if name_col:
+            examples.append(f"list all {model_name_lower} names")
+    elif "simulation" in model_name_lower:
+        examples.append(f"{model_name_lower} status")
+        examples.append(f"{model_name_lower} information")
+        if status_col:
+            examples.append(f"running {model_name_lower}s")
+            examples.append(f"completed {model_name_lower}s")
+    elif "experiment" in model_name_lower:
+        examples.append(f"{model_name_lower} details")
+        examples.append(f"{model_name_lower} information")
+    elif "research" in model_name_lower:
+        examples.append(f"{model_name_lower} goals")
+        examples.append(f"{model_name_lower} questions")
+    elif "message" in model_name_lower or "chat" in model_name_lower:
+        examples.append(f"{model_name_lower} history")
+        examples.append(f"{model_name_lower} content")
+    elif "rating" in model_name_lower:
+        examples.append(f"{model_name_lower}s")
+        examples.append(f"user {model_name_lower}s")
+    elif "session" in model_name_lower:
+        examples.append(f"{model_name_lower} information")
+        examples.append(f"active {model_name_lower}s")
+    
+    # Generic examples
+    if name_col:
+        examples.append(f"{model_name_lower} names")
+    if status_col:
+        examples.append(f"{model_name_lower} status")
+    
+    return examples[:5]  # Limit to 5 examples
+
+
+def get_common_use_cases(model: Dict[str, Any]) -> List[str]:
+    """Identify common use cases for a model based on its columns and name."""
+    model_name = model["model"]
+    model_name_lower = model_name.lower()
+    use_cases = []
+    
+    # Analyze columns to determine use cases
+    has_count_cols = any(c["name"].endswith("_count") for c in model["columns"])
+    has_status = any("status" in c["name"].lower() or "state" in c["name"].lower() for c in model["columns"])
+    has_timestamps = any("created_at" in c["name"].lower() or "updated_at" in c["name"].lower() for c in model["columns"])
+    has_name = any("name" in c["name"].lower() for c in model["columns"])
+    
+    if "statistics" in model_name_lower or "stats" in model_name_lower:
+        use_cases.append("performance metrics and analytics")
+        use_cases.append("aggregated execution statistics")
+        if has_count_cols:
+            use_cases.append("success and failure tracking")
+    elif "program" in model_name_lower:
+        use_cases.append("program definitions and metadata")
+        if has_name:
+            use_cases.append("program identification and lookup")
+    elif "simulation" in model_name_lower:
+        use_cases.append("simulation execution tracking")
+        if has_status:
+            use_cases.append("simulation status monitoring")
+    elif "experiment" in model_name_lower:
+        use_cases.append("experiment management and tracking")
+    elif "research" in model_name_lower:
+        use_cases.append("research goals and questions")
+    elif "message" in model_name_lower or "chat" in model_name_lower:
+        use_cases.append("conversation history")
+        use_cases.append("message content retrieval")
+    elif "rating" in model_name_lower:
+        use_cases.append("user feedback and ratings")
+    elif "session" in model_name_lower:
+        use_cases.append("user session management")
+    
+    if has_timestamps:
+        use_cases.append("temporal queries and filtering")
+    
+    return use_cases[:4]  # Limit to 4 use cases
+
+
+def get_column_query_patterns(column: Dict[str, Any], model: Dict[str, Any]) -> List[str]:
+    """Generate common query patterns for a column."""
+    col_name = column["name"]
+    col_name_lower = col_name.lower()
+    col_type = column["type"].lower()
+    table_name = model["table"]
+    patterns = []
+    
+    if col_name.endswith("_count"):
+        patterns.append(f"COUNT(*) or SUM({col_name}) for aggregation")
+        patterns.append(f"WHERE {col_name} > value for filtering")
+    elif "status" in col_name_lower or "state" in col_name_lower:
+        patterns.append(f"WHERE {col_name} = 'status_value' for filtering")
+        patterns.append(f"COUNT(*) WHERE {col_name} = 'status' for counting by status")
+    elif "created_at" in col_name_lower or "updated_at" in col_name_lower:
+        patterns.append(f"WHERE {col_name} >= date for temporal filtering")
+        patterns.append(f"ORDER BY {col_name} DESC for recent records")
+    elif "datetime" in col_type or "date" in col_type:
+        patterns.append(f"WHERE YEAR({col_name}) = year for year filtering")
+        patterns.append(f"WHERE {col_name} BETWEEN start AND end for date ranges")
+    elif "integer" in col_type or "float" in col_type or "numeric" in col_type:
+        if "avg" in col_name_lower or "average" in col_name_lower:
+            patterns.append(f"AVG({col_name}) for average calculation")
+        else:
+            patterns.append(f"MAX({col_name}) or MIN({col_name}) for min/max")
+            patterns.append(f"WHERE {col_name} > value for numeric filtering")
+    elif "name" in col_name_lower:
+        patterns.append(f"WHERE {col_name} = 'value' for exact match")
+        patterns.append(f"WHERE {col_name} LIKE 'pattern%' for pattern matching")
+    elif col_name.endswith("_id") and "foreign_keys" in column:
+        patterns.append(f"JOIN {table_name}.{col_name} -> target_table.id for relationships")
+    
+    return patterns[:3]  # Limit to 3 patterns
+
+
+def get_status_example_values(column: Dict[str, Any]) -> List[str]:
+    """Get example status values for status/state columns."""
+    col_name = column["name"].lower()
+    
+    # Common status values based on column name
+    if "simulation" in col_name or "execution" in col_name:
+        return ["running", "completed", "failed", "pending"]
+    elif "program" in col_name:
+        return ["active", "inactive", "archived"]
+    elif "experiment" in col_name:
+        return ["draft", "running", "completed", "cancelled"]
+    else:
+        return ["active", "inactive", "pending", "completed", "failed"]
+
+
 def generate_column_text(column: Dict[str, Any], model: Dict[str, Any]) -> str:
     """Generate embedding text for a column document."""
     col_name = column["name"]
@@ -91,6 +302,11 @@ def generate_column_text(column: Dict[str, Any], model: Dict[str, Any]) -> str:
     elif "description" in col_name.lower():
         parts.append("descriptive text")
     
+    # Add usage context
+    purpose = describe_column_purpose(column, model)
+    if purpose:
+        parts.append(f"Used to track or store {purpose}.")
+    
     if not nullable:
         parts.append("Required field.")
     if default:
@@ -100,14 +316,29 @@ def generate_column_text(column: Dict[str, Any], model: Dict[str, Any]) -> str:
         else:
             parts.append(f"Default: {default}.")
     
-    # Add join hints if foreign key
+    # Add example values for status/state columns
+    if "status" in col_name.lower() or "state" in col_name.lower():
+        example_values = get_status_example_values(column)
+        if example_values:
+            parts.append(f"Example values: {', '.join(repr(v) for v in example_values)}.")
+    
+    # Add relationship context for foreign keys
     if "foreign_keys" in column:
         for fk in column["foreign_keys"]:
             if fk.get("target_table") and fk.get("target_column"):
+                target_table = fk["target_table"].replace("_", " ")
                 parts.append(
-                    f"Typically filtered by join {model['table']}.{col_name} -> "
+                    f"Links to {target_table} table via {fk['target_column']} to establish relationship."
+                )
+                parts.append(
+                    f"Join pattern: {model['table']}.{col_name} -> "
                     f"{fk['target_table']}.{fk['target_column']}"
                 )
+    
+    # Add query patterns
+    query_patterns = get_column_query_patterns(column, model)
+    if query_patterns:
+        parts.append(f"Common query patterns: {', '.join(query_patterns)}.")
     
     # Add related columns from same model
     related = []
@@ -130,11 +361,78 @@ def generate_model_text(model: Dict[str, Any]) -> str:
     if model.get("docstring"):
         parts.append(f"— {model['docstring'].strip()}")
     
-    # Add relationship info
+    # Add model purpose/context
+    model_name_lower = model["model"].lower()
+    if "statistics" in model_name_lower or "stats" in model_name_lower:
+        parts.append("This model stores aggregated performance metrics and execution statistics.")
+    elif "program" in model_name_lower:
+        parts.append("This model represents executable simulation programs and their metadata.")
+    elif "simulation" in model_name_lower:
+        parts.append("This model tracks simulation executions, status, and results.")
+    elif "experiment" in model_name_lower:
+        parts.append("This model manages experiments and their configurations.")
+    elif "research" in model_name_lower:
+        parts.append("This model stores research goals, questions, and related information.")
+    elif "message" in model_name_lower or "chat" in model_name_lower:
+        parts.append("This model stores conversation history and message content.")
+    elif "rating" in model_name_lower:
+        parts.append("This model stores user ratings and feedback.")
+    elif "session" in model_name_lower:
+        parts.append("This model manages user sessions and authentication.")
+    
+    # Add column summary (key columns and their purposes)
+    key_cols = get_key_columns(model)
+    if key_cols:
+        col_descriptions = []
+        for col in key_cols[:6]:  # Limit to 6 key columns
+            purpose = describe_column_purpose(col, model)
+            col_display = col["name"].replace("_", " ")
+            col_descriptions.append(f"{col_display} ({purpose})")
+        if col_descriptions:
+            parts.append(f"Key columns: {', '.join(col_descriptions)}")
+    
+    # Add common use cases
+    use_cases = get_common_use_cases(model)
+    if use_cases:
+        parts.append(f"Commonly used for: {', '.join(use_cases)}")
+    
+    # Add example queries
+    example_queries = get_example_queries_for_model(model)
+    if example_queries:
+        parts.append(f"Example queries: {', '.join(repr(q) for q in example_queries)}")
+    
+    # Add relationship context
     if model.get("relationships"):
-        rel_names = [r["name"] for r in model["relationships"]]
-        if rel_names:
-            parts.append(f"Relationships: {', '.join(rel_names)}")
+        rel_descriptions = []
+        for rel in model["relationships"]:
+            rel_name = rel.get("name", "")
+            target_model = rel.get("target_model", "")
+            target_table = rel.get("target_table", "")
+            join_pairs = rel.get("join_pairs", [])
+            
+            if target_model and join_pairs:
+                # Describe the relationship
+                target_display = target_model.lower().replace("_", " ")
+                rel_descriptions.append(f"related to {target_display} via {rel_name}")
+        
+        if rel_descriptions:
+            parts.append(f"Relationships: {', '.join(rel_descriptions)}")
+    
+    # Add foreign key relationships context
+    fk_descriptions = []
+    for col in model.get("columns", []):
+        if "foreign_keys" in col:
+            for fk in col["foreign_keys"]:
+                target_table = fk.get("target_table", "")
+                target_column = fk.get("target_column", "")
+                if target_table:
+                    target_display = target_table.replace("_", " ")
+                    fk_descriptions.append(
+                        f"linked to {target_display} via {col['name']} -> {target_column}"
+                    )
+    
+    if fk_descriptions:
+        parts.append(f"Foreign key relationships: {', '.join(fk_descriptions[:3])}")  # Limit to 3
     
     return " ".join(parts)
 
