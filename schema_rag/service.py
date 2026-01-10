@@ -109,20 +109,46 @@ class SchemaRagService:
             logger.warning(f"Failed to load schema synonyms: {e}")
             return question
         
-        # Split into words and phrases
-        words = question.lower().split()
+        # Build reverse synonym map for bidirectional expansion
+        reverse_synonyms = {}
+        for key, values in synonyms.items():
+            for value in values:
+                if value not in reverse_synonyms:
+                    reverse_synonyms[value] = []
+                reverse_synonyms[value].append(key)
+        
+        # Merge reverse synonyms into main map
+        for key, values in reverse_synonyms.items():
+            if key not in synonyms:
+                synonyms[key] = values
+            else:
+                # Merge without duplicates
+                synonyms[key] = list(set(synonyms[key] + values))
+        
+        question_lower = question.lower()
+        words = question_lower.split()
         expanded = []
         
-        for word in words:
+        # First pass: expand individual words and build phrase candidates
+        i = 0
+        while i < len(words):
+            word = words[i]
             expanded.append(word)
-            # Check for exact match
+            
+            # Check for exact word match
             if word in synonyms:
                 expanded.extend(synonyms[word])
-            # Check for phrase matches (2-word phrases)
-            if len(expanded) >= 2:
-                phrase = f"{expanded[-2]} {expanded[-1]}"
+            
+            # Check for multi-word phrases (2-4 words) starting at current position
+            for phrase_len in range(2, min(5, len(words) - i + 1)):
+                phrase = " ".join(words[i:i + phrase_len])
                 if phrase in synonyms:
                     expanded.extend(synonyms[phrase])
+                    # Skip words that are part of matched phrase
+                    i += phrase_len - 1
+                    break
+            
+            i += 1
         
         return " ".join(expanded)
     
@@ -136,6 +162,10 @@ class SchemaRagService:
         """Calculate lexical boost score for a document."""
         boost = 0.0
         
+        # Status-related keywords
+        status_keywords = {"running", "completed", "active", "inactive", "status", "state", "finished", "done"}
+        has_status_keyword = any(kw in status_keywords for kw in query_keywords)
+        
         # Check metadata keywords
         doc_keywords = doc.get("metadata", {}).get("keywords", [])
         for qkw in query_keywords:
@@ -146,6 +176,14 @@ class SchemaRagService:
         col_name = doc.get("metadata", {}).get("column", "")
         model_name = doc.get("metadata", {}).get("model", "")
         table_name = doc.get("metadata", {}).get("table", "")
+        
+        # Status column boosting
+        if has_status_keyword and col_name.lower() == "status":
+            boost += 4.0  # Very strong boost for status column when status keywords present
+            # Additional boost for exact status value matches in query
+            for qkw in query_keywords:
+                if qkw in ["running", "completed", "active", "inactive", "finished", "done"]:
+                    boost += 2.0  # Extra boost for specific status values
         
         for qkw in query_keywords:
             if qkw in col_name.lower():
@@ -183,11 +221,27 @@ class SchemaRagService:
                     entities["program_name"] = name
                     break
         
-        # Date patterns (simplified for POC)
-        if re.search(r'\d{4}', question):
-            entities["has_date"] = True
-        if re.search(r'(?:last|past|recent|since)', question_lower):
-            entities["has_date"] = True
+        # Enhanced temporal patterns
+        temporal_patterns = [
+            r'\d{4}',  # Year (e.g., "2024")
+            r'(?:last|past|recent|since|before|after)',  # Temporal keywords
+            r'(?:created|updated|modified)\s+(?:in|on|at|recently)',  # Created/updated patterns
+            r'(?:in|during)\s+\d{4}',  # "in 2024"
+            r'recently',  # Recently
+            r'last\s+(?:used|created|updated|modified)',  # "last used", "last created"
+        ]
+        for pattern in temporal_patterns:
+            if re.search(pattern, question_lower):
+                entities["has_date"] = True
+                break
+        
+        # Detect specific temporal column types
+        if re.search(r'(?:created|creation)', question_lower):
+            entities["temporal_type"] = "created"
+        elif re.search(r'(?:updated|modified|last\s+used)', question_lower):
+            entities["temporal_type"] = "updated"
+        elif re.search(r'(?:executed|ran|run)', question_lower):
+            entities["temporal_type"] = "executed"
         
         # Numeric filters
         numeric_patterns = [
@@ -236,11 +290,27 @@ class SchemaRagService:
                 if program_name in doc.get("text", "").lower():
                     boost += 3.0
             
-            # Boost date-related columns if date entities present
+            # Enhanced temporal column boosting
             if entities.get("has_date"):
                 col_name = metadata.get("column", "").lower()
-                if any(term in col_name for term in ["date", "time", "at", "created", "updated"]):
-                    boost += 1.5
+                temporal_type = entities.get("temporal_type", "")
+                
+                # Boost all temporal columns
+                if any(term in col_name for term in ["date", "time", "at", "created", "updated", "executed", "modified"]):
+                    boost += 2.0  # Increased from 1.5
+                
+                # Stronger boost for specific temporal types
+                if temporal_type == "created" and "created" in col_name:
+                    boost += 2.0
+                elif temporal_type == "updated" and ("updated" in col_name or "modified" in col_name or "last_used" in col_name):
+                    boost += 2.0
+                elif temporal_type == "executed" and "executed" in col_name:
+                    boost += 2.0
+                
+                # Boost for year patterns (e.g., "created in 2024")
+                if re.search(r'\d{4}', doc.get("text", "")):
+                    if any(term in col_name for term in ["created", "updated", "date", "at"]):
+                        boost += 1.5
             
             # Boost numeric columns if numeric filters present
             if "min_value" in entities or "max_value" in entities:
