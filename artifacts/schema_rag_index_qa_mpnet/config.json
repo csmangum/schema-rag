@@ -1,0 +1,5 @@
+{
+  "dimension": 768,
+  "model_name": "multi-qa-mpnet-base-dot-v1",
+  "num_documents": 825
+}

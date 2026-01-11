@@ -1,0 +1,5 @@
+{
+  "dimension": 768,
+  "model_name": "all-mpnet-base-v2",
+  "num_documents": 825
+}
