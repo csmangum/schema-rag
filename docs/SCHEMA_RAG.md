@@ -8,9 +8,8 @@ Schema RAG (Retrieval Augmented Generation) is a proof-of-concept system that en
 
 ```mermaid
 graph TB
-    subgraph "Schema Export"
-        Models[SQLAlchemy Models] --> ExportScript[export_sqlalchemy_models_json.py]
-        ExportScript --> SchemaJSON[artifacts/sqlalchemy_models.json]
+    subgraph "Schema Input"
+        Models[SQLAlchemy Models] --> SchemaJSON[artifacts/sqlalchemy_models.json<br/>User-provided schema JSON]
     end
     
     subgraph "Document Generation"
@@ -31,23 +30,24 @@ graph TB
         SchemaRagService --> GroundingResult[GroundingResult<br/>schema_refs + join_hints + recipes]
     end
     
-    subgraph "API Integration"
-        GroundingResult --> APIEndpoint[POST /api/schema/grounding]
+    subgraph "Integration (Conceptual)"
+        GroundingResult --> APIEndpoint[POST /api/schema/grounding<br/>Future API endpoint]
         APIEndpoint --> Agent[Agent/LLM]
     end
 ```
 
 ## System Components
 
-### 1. Schema Export
+### 1. Schema Input
 
-**Script**: `scripts/export_sqlalchemy_models_json.py` (optional, provided as example)
+**Input**: `artifacts/sqlalchemy_models.json` (user-provided)
 
-Exports SQLAlchemy models to structured JSON format:
-- Inspects all models in your project
-- Extracts metadata: table names, columns, types, relationships, foreign keys
-- Outputs to JSON file
-- Includes relationship mappings and foreign key paths for join hints
+The system requires a schema JSON file in a specific format. You need to provide this file yourself - it should contain:
+- Model metadata: table names, columns, types, relationships, foreign keys
+- Relationship mappings and foreign key paths for join hints
+- Column metadata: types, nullable flags, defaults
+
+The schema JSON format should match the structure expected by `generate_schema_rag_docs.py`. You can export this from your SQLAlchemy models using your own tooling or create it manually.
 
 ### 2. Document Generation
 
@@ -175,7 +175,7 @@ python scripts/query_schema_rag.py "What is the success count for the forest fir
 ## Data Flow
 
 1. **Build Time**:
-   - Export SQLAlchemy models → JSON (optional, you can provide your own schema JSON)
+   - Provide schema JSON file (user must export/create from SQLAlchemy models)
    - Generate documents (models, columns, recipes) → JSONL
    - Generate embeddings → FAISS index
 
