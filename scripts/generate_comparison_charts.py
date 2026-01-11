@@ -8,7 +8,6 @@ from typing import Dict, List, Any
 
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.patches as mpatches
     import numpy as np
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
@@ -59,7 +58,7 @@ def create_accuracy_vs_speed_chart(models: List[Dict[str, Any]], output_path: Pa
     names = [m["display_name"] for m in models]
     
     # Create scatter plot
-    scatter = ax.scatter(query_times, match_rates, s=200, alpha=0.7, c=range(len(models)), cmap='viridis')
+    ax.scatter(query_times, match_rates, s=200, alpha=0.7, c=range(len(models)), cmap='viridis')
     
     # Add labels
     for i, (name, x, y) in enumerate(zip(names, query_times, match_rates)):
@@ -89,7 +88,7 @@ def create_index_size_chart(models: List[Dict[str, Any]], output_path: Path):
     names = [m["display_name"] for m in models]
     sizes = [m["index_size_mb"] for m in models]
     
-    bars = ax.barh(names, sizes, color='steelblue', alpha=0.7)
+    ax.barh(names, sizes, color='steelblue', alpha=0.7)
     
     # Add value labels
     for i, (name, size) in enumerate(zip(names, sizes)):
@@ -192,7 +191,7 @@ def create_summary_comparison_chart(models: List[Dict[str, Any]], output_path: P
     
     # 4. Accuracy vs Speed Scatter
     ax4 = fig.add_subplot(gs[1, :2])
-    scatter = ax4.scatter(query_times, match_rates, s=300, alpha=0.7, c=range(len(models)), cmap='viridis', edgecolors='black', linewidth=1.5)
+    ax4.scatter(query_times, match_rates, s=300, alpha=0.7, c=range(len(models)), cmap='viridis', edgecolors='black', linewidth=1.5)
     for i, (name, x, y) in enumerate(zip(names, query_times, match_rates)):
         ax4.annotate(name, (x, y), xytext=(5, 5), textcoords='offset points', fontsize=10, fontweight='bold')
     ax4.set_xlabel('Query Time (ms)', fontsize=11, fontweight='bold')
@@ -231,7 +230,7 @@ def create_efficiency_score_chart(models: List[Dict[str, Any]], output_path: Pat
         efficiency = m["match_rate"] / (time_penalty * size_penalty)
         efficiencies.append(efficiency)
     
-    bars = ax.barh(names, efficiencies, color='coral', alpha=0.7)
+    ax.barh(names, efficiencies, color='coral', alpha=0.7)
     
     # Add value labels
     for i, (name, eff) in enumerate(zip(names, efficiencies)):

@@ -2,7 +2,6 @@
 """List available sentence-transformers models and their specifications."""
 
 from sentence_transformers import SentenceTransformer
-import sys
 
 # Models to check - organized by tier
 models_to_check = {

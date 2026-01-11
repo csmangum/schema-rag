@@ -210,7 +210,8 @@ def run_tests_for_model(
     # Warm-up query (not counted)
     try:
         service.retrieve_grounding("test query", top_k=5)
-    except:
+    except Exception:
+        # Warm-up failures are non-fatal and intentionally ignored so they don't affect benchmarking.
         pass
     
     for i, question in enumerate(questions, 1):
@@ -394,7 +395,7 @@ def compare_results(results1: Dict[str, Any], results2: Dict[str, Any]) -> Dict[
             "model1": init1,
             "model2": init2,
             "difference": init2 - init1,
-            "difference_percent": ((init2 - init1) / init1 * 100) if init1 > 0 else 0,
+            "difference_percent": (init2 - init1) / init1 * 100,
         }
     
     # Query time
@@ -470,27 +471,27 @@ def generate_comparison_report(comparison: Dict[str, Any], output_file: Path):
     perf = comparison.get("performance", {})
     
     if "initialization_time" in perf:
-        it = perf["initialization_time"]
+        init_time_data = perf["initialization_time"]
         lines.append(f"Initialization Time:")
-        lines.append(f"  Model 1: {it['model1']:.3f}s")
-        lines.append(f"  Model 2: {it['model2']:.3f}s")
-        lines.append(f"  Difference: {it['difference']:+.3f}s ({it['difference_percent']:+.2f}%)")
+        lines.append(f"  Model 1: {init_time_data['model1']:.3f}s")
+        lines.append(f"  Model 2: {init_time_data['model2']:.3f}s")
+        lines.append(f"  Difference: {init_time_data['difference']:+.3f}s ({init_time_data['difference_percent']:+.2f}%)")
         lines.append("")
     
     if "query_time_mean" in perf:
-        qt = perf["query_time_mean"]
+        query_time_mean_stats = perf["query_time_mean"]
         lines.append(f"Query Time (Mean):")
-        lines.append(f"  Model 1: {qt['model1']*1000:.2f}ms")
-        lines.append(f"  Model 2: {qt['model2']*1000:.2f}ms")
-        lines.append(f"  Difference: {qt['difference']*1000:+.2f}ms ({qt['difference_percent']:+.2f}%)")
+        lines.append(f"  Model 1: {query_time_mean_stats['model1']*1000:.2f}ms")
+        lines.append(f"  Model 2: {query_time_mean_stats['model2']*1000:.2f}ms")
+        lines.append(f"  Difference: {query_time_mean_stats['difference']*1000:+.2f}ms ({query_time_mean_stats['difference_percent']:+.2f}%)")
         lines.append("")
         
         if "query_time_p95" in perf:
-            qt95 = perf["query_time_p95"]
+            query_time_p95_stats = perf["query_time_p95"]
             lines.append(f"Query Time (P95):")
-            lines.append(f"  Model 1: {qt95['model1']*1000:.2f}ms")
-            lines.append(f"  Model 2: {qt95['model2']*1000:.2f}ms")
-            lines.append(f"  Difference: {qt95['difference']*1000:+.2f}ms")
+            lines.append(f"  Model 1: {query_time_p95_stats['model1']*1000:.2f}ms")
+            lines.append(f"  Model 2: {query_time_p95_stats['model2']*1000:.2f}ms")
+            lines.append(f"  Difference: {query_time_p95_stats['difference']*1000:+.2f}ms")
             lines.append("")
     
     if "index_size" in perf:
