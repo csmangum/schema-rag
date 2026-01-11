@@ -1,0 +1,5 @@
+{
+  "dimension": 384,
+  "model_name": "all-MiniLM-L12-v2",
+  "num_documents": 825
+}

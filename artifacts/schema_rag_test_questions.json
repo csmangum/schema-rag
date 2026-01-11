@@ -768,5 +768,880 @@
     "expected_column": "latency_median_ms",
     "id": 110,
     "category": "general"
+  },
+  {
+    "question": "How many runs for program test",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "category": "synonym_expansion",
+    "id": 111
+  },
+  {
+    "question": "Number of executions for forest fire",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "category": "synonym_expansion",
+    "id": 112
+  },
+  {
+    "question": "Total times program was executed",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "category": "synonym_expansion",
+    "id": 113
+  },
+  {
+    "question": "Count of program runs",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "category": "synonym_expansion",
+    "id": 114
+  },
+  {
+    "question": "Programs that succeeded",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "category": "synonym_expansion",
+    "id": 115
+  },
+  {
+    "question": "Programs that failed",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "failure_count",
+    "category": "synonym_expansion",
+    "id": 116
+  },
+  {
+    "question": "Mean execution duration",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "avg_execution_time",
+    "category": "synonym_expansion",
+    "id": 117
+  },
+  {
+    "question": "Average memory consumption",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "avg_memory_usage",
+    "category": "synonym_expansion",
+    "id": 118
+  },
+  {
+    "question": "Programs that are active",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "category": "synonym_expansion",
+    "id": 119
+  },
+  {
+    "question": "Finished simulations",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "category": "synonym_expansion",
+    "id": 120
+  },
+  {
+    "question": "Simulations that are done",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "category": "synonym_expansion",
+    "id": 121
+  },
+  {
+    "question": "Experiments modified recently",
+    "expected_model": "Experiment",
+    "expected_column": "updated_at",
+    "category": "synonym_expansion",
+    "id": 122
+  },
+  {
+    "question": "Research projects created last month",
+    "expected_model": "Research",
+    "expected_column": "created_at",
+    "category": "synonym_expansion",
+    "id": 123
+  },
+  {
+    "question": "Programs last used in the past week",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "last_used_at",
+    "category": "synonym_expansion",
+    "id": 124
+  },
+  {
+    "question": "Experiments started since 2024",
+    "expected_model": "Experiment",
+    "expected_column": "started_at",
+    "category": "synonym_expansion",
+    "id": 125
+  },
+  {
+    "question": "Which experiments belong to a research project",
+    "expected_model": "Experiment",
+    "expected_column": "research_id",
+    "category": "relationship",
+    "id": 126
+  },
+  {
+    "question": "Simulations linked to an experiment",
+    "expected_model": "Simulation",
+    "expected_column": "experiment_id",
+    "category": "relationship",
+    "id": 127
+  },
+  {
+    "question": "Program variants for a program",
+    "expected_model": "ProgramVariant",
+    "expected_column": "program_id",
+    "category": "relationship",
+    "id": 128
+  },
+  {
+    "question": "Statistics for a specific program",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "program_id",
+    "category": "relationship",
+    "id": 129
+  },
+  {
+    "question": "Executions for a program variant",
+    "expected_model": "ProgramExecution",
+    "expected_column": "variant_id",
+    "category": "relationship",
+    "id": 130
+  },
+  {
+    "question": "Research questions for a research project",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "research_id",
+    "category": "relationship",
+    "id": 131
+  },
+  {
+    "question": "Notes attached to a research project",
+    "expected_model": "Note",
+    "expected_column": "research_id",
+    "category": "relationship",
+    "id": 132
+  },
+  {
+    "question": "Notes attached to an experiment",
+    "expected_model": "Note",
+    "expected_column": "experiment_id",
+    "category": "relationship",
+    "id": 133
+  },
+  {
+    "question": "Simulation configuration for a simulation",
+    "expected_model": "SimulationConfig",
+    "expected_column": "simulation_id",
+    "category": "relationship",
+    "id": 134
+  },
+  {
+    "question": "Metrics for a specific simulation",
+    "expected_model": "SimulationMetrics",
+    "expected_column": "simulation_id",
+    "category": "relationship",
+    "id": 135
+  },
+  {
+    "question": "Agent snapshots for a simulation",
+    "expected_model": "AgentSnapshot",
+    "expected_column": "simulation_id",
+    "category": "relationship",
+    "id": 136
+  },
+  {
+    "question": "Agent introspection for a simulation",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "simulation_id",
+    "category": "relationship",
+    "id": 137
+  },
+  {
+    "question": "Agent lineage for a simulation",
+    "expected_model": "AgentLineage",
+    "expected_column": "simulation_id",
+    "category": "relationship",
+    "id": 138
+  },
+  {
+    "question": "Chat messages for a simulation",
+    "expected_model": "ChatMessage",
+    "expected_column": "simulation_id",
+    "category": "relationship",
+    "id": 139
+  },
+  {
+    "question": "Experiment simulations linking experiments to simulations",
+    "expected_model": "ExperimentSimulation",
+    "expected_column": "experiment_id",
+    "category": "relationship",
+    "id": 140
+  },
+  {
+    "question": "Success count for program named forest fire",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "category": "query_recipe",
+    "id": 141
+  },
+  {
+    "question": "Failure count for program forest fire",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "failure_count",
+    "category": "query_recipe",
+    "id": 142
+  },
+  {
+    "question": "How many times was program forest fire executed",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "category": "query_recipe",
+    "id": 143
+  },
+  {
+    "question": "Average execution time for program forest fire",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "avg_execution_time",
+    "category": "query_recipe",
+    "id": 144
+  },
+  {
+    "question": "Programs with success count greater than 100",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "category": "query_recipe",
+    "id": 145
+  },
+  {
+    "question": "Programs with failure count less than 10",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "failure_count",
+    "category": "query_recipe",
+    "id": 146
+  },
+  {
+    "question": "Simulations that are currently running",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "category": "query_recipe",
+    "id": 147
+  },
+  {
+    "question": "Simulations that have completed",
+    "expected_model": "Simulation",
+    "expected_column": "status",
+    "category": "query_recipe",
+    "id": 148
+  },
+  {
+    "question": "Experiments with status completed",
+    "expected_model": "Experiment",
+    "expected_column": "status",
+    "category": "query_recipe",
+    "id": 149
+  },
+  {
+    "question": "Research projects with active status",
+    "expected_model": "Research",
+    "expected_column": "status",
+    "category": "query_recipe",
+    "id": 150
+  },
+  {
+    "question": "Simulations started in the last 7 days",
+    "expected_model": "Simulation",
+    "expected_column": "started_at",
+    "category": "query_recipe",
+    "id": 151
+  },
+  {
+    "question": "Experiments created in 2024",
+    "expected_model": "Experiment",
+    "expected_column": "created_at",
+    "category": "query_recipe",
+    "id": 152
+  },
+  {
+    "question": "Programs last used in the past month",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "last_used_at",
+    "category": "query_recipe",
+    "id": 153
+  },
+  {
+    "question": "Research projects updated recently",
+    "expected_model": "Research",
+    "expected_column": "updated_at",
+    "category": "query_recipe",
+    "id": 154
+  },
+  {
+    "question": "Program executions that succeeded",
+    "expected_model": "ProgramExecution",
+    "expected_column": "success",
+    "category": "query_recipe",
+    "id": 155
+  },
+  {
+    "question": "Program statistics with variant information",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "variant_id",
+    "category": "ambiguity",
+    "id": 156
+  },
+  {
+    "question": "Statistics for program variants",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "variant_id",
+    "category": "ambiguity",
+    "id": 157
+  },
+  {
+    "question": "Program statistics that include variant data",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "variant_id",
+    "category": "ambiguity",
+    "id": 158
+  },
+  {
+    "question": "Variant-specific program statistics",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "variant_id",
+    "category": "ambiguity",
+    "id": 159
+  },
+  {
+    "question": "Program statistics aggregated by variant",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "variant_id",
+    "category": "ambiguity",
+    "id": 160
+  },
+  {
+    "question": "Programs created after 2023",
+    "expected_model": "Program",
+    "expected_column": "created_at",
+    "category": "entity_extraction",
+    "id": 161
+  },
+  {
+    "question": "Programs created before 2025",
+    "expected_model": "Program",
+    "expected_column": "created_at",
+    "category": "entity_extraction",
+    "id": 162
+  },
+  {
+    "question": "Simulations started during 2024",
+    "expected_model": "Simulation",
+    "expected_column": "started_at",
+    "category": "entity_extraction",
+    "id": 163
+  },
+  {
+    "question": "Experiments completed in the last 30 days",
+    "expected_model": "Experiment",
+    "expected_column": "completed_at",
+    "category": "entity_extraction",
+    "id": 164
+  },
+  {
+    "question": "Programs with more than 50 successes",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "success_count",
+    "category": "entity_extraction",
+    "id": 165
+  },
+  {
+    "question": "Programs with fewer than 5 failures",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "failure_count",
+    "category": "entity_extraction",
+    "id": 166
+  },
+  {
+    "question": "Programs with usage count over 1000",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "usage_count",
+    "category": "entity_extraction",
+    "id": 167
+  },
+  {
+    "question": "Simulations with total steps greater than 1000",
+    "expected_model": "Simulation",
+    "expected_column": "total_steps",
+    "category": "entity_extraction",
+    "id": 168
+  },
+  {
+    "question": "Experiments with target iterations above 10",
+    "expected_model": "Experiment",
+    "expected_column": "target_iterations",
+    "category": "entity_extraction",
+    "id": 169
+  },
+  {
+    "question": "Experiments with completed iterations below 5",
+    "expected_model": "Experiment",
+    "expected_column": "completed_iterations",
+    "category": "entity_extraction",
+    "id": 170
+  },
+  {
+    "question": "Agent lineage with birth step after 100",
+    "expected_model": "AgentLineage",
+    "expected_column": "birth_step",
+    "category": "entity_extraction",
+    "id": 171
+  },
+  {
+    "question": "Agent lineage with death step before 500",
+    "expected_model": "AgentLineage",
+    "expected_column": "death_step",
+    "category": "entity_extraction",
+    "id": 172
+  },
+  {
+    "question": "Simulations with current step greater than 50",
+    "expected_model": "Simulation",
+    "expected_column": "current_step",
+    "category": "entity_extraction",
+    "id": 173
+  },
+  {
+    "question": "Research questions with priority higher than 5",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "priority",
+    "category": "entity_extraction",
+    "id": 174
+  },
+  {
+    "question": "Local LLM runs with accuracy above 0.9",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "accuracy",
+    "category": "entity_extraction",
+    "id": 175
+  },
+  {
+    "question": "Program inline code",
+    "expected_model": "Program",
+    "expected_column": "inline_code",
+    "category": "advanced",
+    "id": 176
+  },
+  {
+    "question": "Program script file path",
+    "expected_model": "Program",
+    "expected_column": "script_file",
+    "category": "advanced",
+    "id": 177
+  },
+  {
+    "question": "Program output schema",
+    "expected_model": "Program",
+    "expected_column": "output_schema",
+    "category": "advanced",
+    "id": 178
+  },
+  {
+    "question": "Program post processing config",
+    "expected_model": "Program",
+    "expected_column": "post_processing_config",
+    "category": "advanced",
+    "id": 179
+  },
+  {
+    "question": "Program variant parameter overrides",
+    "expected_model": "ProgramVariant",
+    "expected_column": "parameter_overrides",
+    "category": "advanced",
+    "id": 180
+  },
+  {
+    "question": "Program variant code overrides",
+    "expected_model": "ProgramVariant",
+    "expected_column": "code_overrides",
+    "category": "advanced",
+    "id": 181
+  },
+  {
+    "question": "Program statistics output metrics",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "output_metrics",
+    "category": "advanced",
+    "id": 182
+  },
+  {
+    "question": "Program statistics parameter stats",
+    "expected_model": "ProgramStatistics",
+    "expected_column": "parameter_stats",
+    "category": "advanced",
+    "id": 183
+  },
+  {
+    "question": "Program execution output data",
+    "expected_model": "ProgramExecution",
+    "expected_column": "output_data",
+    "category": "advanced",
+    "id": 184
+  },
+  {
+    "question": "Program execution post processed output",
+    "expected_model": "ProgramExecution",
+    "expected_column": "post_processed_output",
+    "category": "advanced",
+    "id": 185
+  },
+  {
+    "question": "Program execution error message",
+    "expected_model": "ProgramExecution",
+    "expected_column": "error_message",
+    "category": "advanced",
+    "id": 186
+  },
+  {
+    "question": "Simulation config template version",
+    "expected_model": "SimulationConfig",
+    "expected_column": "template_version",
+    "category": "advanced",
+    "id": 187
+  },
+  {
+    "question": "Simulation metrics timestamp",
+    "expected_model": "SimulationMetrics",
+    "expected_column": "timestamp",
+    "category": "advanced",
+    "id": 188
+  },
+  {
+    "question": "Agent snapshot timestamp",
+    "expected_model": "AgentSnapshot",
+    "expected_column": "timestamp",
+    "category": "advanced",
+    "id": 189
+  },
+  {
+    "question": "Agent introspection position x",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "position_x",
+    "category": "advanced",
+    "id": 190
+  },
+  {
+    "question": "Agent introspection position y",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "position_y",
+    "category": "advanced",
+    "id": 191
+  },
+  {
+    "question": "Agent introspection age",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "age",
+    "category": "advanced",
+    "id": 192
+  },
+  {
+    "question": "Agent introspection policy state",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "policy_state",
+    "category": "advanced",
+    "id": 193
+  },
+  {
+    "question": "Agent introspection attention",
+    "expected_model": "AgentIntrospection",
+    "expected_column": "attention",
+    "category": "advanced",
+    "id": 194
+  },
+  {
+    "question": "Agent lineage metabolism rate",
+    "expected_model": "AgentLineage",
+    "expected_column": "metabolism_rate",
+    "category": "advanced",
+    "id": 195
+  },
+  {
+    "question": "Agent lineage max health",
+    "expected_model": "AgentLineage",
+    "expected_column": "max_health",
+    "category": "additional",
+    "id": 196
+  },
+  {
+    "question": "Agent lineage max resources",
+    "expected_model": "AgentLineage",
+    "expected_column": "max_resources",
+    "category": "additional",
+    "id": 197
+  },
+  {
+    "question": "Experiment description",
+    "expected_model": "Experiment",
+    "expected_column": "description",
+    "category": "additional",
+    "id": 198
+  },
+  {
+    "question": "Experiment hypothesis",
+    "expected_model": "Experiment",
+    "expected_column": "hypothesis",
+    "category": "additional",
+    "id": 199
+  },
+  {
+    "question": "Experiment parameter variations",
+    "expected_model": "Experiment",
+    "expected_column": "parameter_variations",
+    "category": "additional",
+    "id": 200
+  },
+  {
+    "question": "Experiment tags",
+    "expected_model": "Experiment",
+    "expected_column": "tags",
+    "category": "additional",
+    "id": 201
+  },
+  {
+    "question": "Experiment notes",
+    "expected_model": "Experiment",
+    "expected_column": "notes",
+    "category": "additional",
+    "id": 202
+  },
+  {
+    "question": "Research sub name",
+    "expected_model": "Research",
+    "expected_column": "sub_name",
+    "category": "additional",
+    "id": 203
+  },
+  {
+    "question": "Research session id",
+    "expected_model": "Research",
+    "expected_column": "session_id",
+    "category": "additional",
+    "id": 204
+  },
+  {
+    "question": "Research question details",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "details",
+    "category": "additional",
+    "id": 205
+  },
+  {
+    "question": "Research question tags",
+    "expected_model": "ResearchQuestion",
+    "expected_column": "tags",
+    "category": "additional",
+    "id": 206
+  },
+  {
+    "question": "Research flow session form data",
+    "expected_model": "ResearchFlowSession",
+    "expected_column": "form_data",
+    "category": "additional",
+    "id": 207
+  },
+  {
+    "question": "Research flow session state metadata",
+    "expected_model": "ResearchFlowSession",
+    "expected_column": "state_metadata",
+    "category": "additional",
+    "id": 208
+  },
+  {
+    "question": "Research flow session history",
+    "expected_model": "ResearchFlowSession",
+    "expected_column": "history",
+    "category": "additional",
+    "id": 209
+  },
+  {
+    "question": "Research flow session summary",
+    "expected_model": "ResearchFlowSession",
+    "expected_column": "summary",
+    "category": "additional",
+    "id": 210
+  },
+  {
+    "question": "Assistant rating message id",
+    "expected_model": "AssistantRating",
+    "expected_column": "message_id",
+    "category": "assistant",
+    "id": 211
+  },
+  {
+    "question": "Assistant rating simulation id",
+    "expected_model": "AssistantRating",
+    "expected_column": "simulation_id",
+    "category": "assistant",
+    "id": 212
+  },
+  {
+    "question": "Assistant studio trace system prompt",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "system_prompt",
+    "category": "assistant",
+    "id": 213
+  },
+  {
+    "question": "Assistant studio trace context snapshot",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "context_snapshot",
+    "category": "assistant",
+    "id": 214
+  },
+  {
+    "question": "Assistant studio trace timings",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "timings_ms",
+    "category": "assistant",
+    "id": 215
+  },
+  {
+    "question": "Assistant studio trace validation",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "validation",
+    "category": "assistant",
+    "id": 216
+  },
+  {
+    "question": "Assistant studio trace metadata",
+    "expected_model": "AssistantStudioTrace",
+    "expected_column": "trace_metadata",
+    "category": "assistant",
+    "id": 217
+  },
+  {
+    "question": "Chat message experiment id",
+    "expected_model": "ChatMessage",
+    "expected_column": "experiment_id",
+    "category": "assistant",
+    "id": 218
+  },
+  {
+    "question": "Tool telemetry start timestamp",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "start_timestamp",
+    "category": "assistant",
+    "id": 219
+  },
+  {
+    "question": "Tool telemetry end timestamp",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "end_timestamp",
+    "category": "assistant",
+    "id": 220
+  },
+  {
+    "question": "Tool telemetry experiment id",
+    "expected_model": "ToolTelemetryEvent",
+    "expected_column": "experiment_id",
+    "category": "assistant",
+    "id": 221
+  },
+  {
+    "question": "User session api key id",
+    "expected_model": "UserSession",
+    "expected_column": "api_key_id",
+    "category": "assistant",
+    "id": 222
+  },
+  {
+    "question": "User session expires at",
+    "expected_model": "UserSession",
+    "expected_column": "expires_at",
+    "category": "assistant",
+    "id": 223
+  },
+  {
+    "question": "User research event title",
+    "expected_model": "UserResearchEvent",
+    "expected_column": "title",
+    "category": "assistant",
+    "id": 224
+  },
+  {
+    "question": "User research event body",
+    "expected_model": "UserResearchEvent",
+    "expected_column": "body",
+    "category": "assistant",
+    "id": 225
+  },
+  {
+    "question": "Local LLM decision run error",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "error",
+    "category": "llm_metric",
+    "id": 226
+  },
+  {
+    "question": "Local LLM decision run base url",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "base_url",
+    "category": "llm_metric",
+    "id": 227
+  },
+  {
+    "question": "Local LLM decision run model",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "model",
+    "category": "llm_metric",
+    "id": 228
+  },
+  {
+    "question": "Local LLM decision run throughput",
+    "expected_model": "LocalLLMDecisionRun",
+    "expected_column": "throughput_total",
+    "category": "llm_metric",
+    "id": 229
+  },
+  {
+    "question": "Metric definition description",
+    "expected_model": "MetricDefinition",
+    "expected_column": "description",
+    "category": "llm_metric",
+    "id": 230
+  },
+  {
+    "question": "Metric definition color scheme",
+    "expected_model": "MetricDefinition",
+    "expected_column": "color_scheme",
+    "category": "llm_metric",
+    "id": 231
+  },
+  {
+    "question": "Metric definition unit",
+    "expected_model": "MetricDefinition",
+    "expected_column": "unit",
+    "category": "llm_metric",
+    "id": 232
+  },
+  {
+    "question": "Metric definition icon",
+    "expected_model": "MetricDefinition",
+    "expected_column": "icon",
+    "category": "llm_metric",
+    "id": 233
+  },
+  {
+    "question": "Metric definition priority",
+    "expected_model": "MetricDefinition",
+    "expected_column": "priority",
+    "category": "llm_metric",
+    "id": 234
+  },
+  {
+    "question": "Metric definition threshold",
+    "expected_model": "MetricDefinition",
+    "expected_column": "threshold",
+    "category": "llm_metric",
+    "id": 235
   }
 ]

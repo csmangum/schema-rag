@@ -9,10 +9,12 @@ Schema RAG enables agents and LLMs to ground their responses in database schema 
 - Using hybrid retrieval (vector similarity + lexical matching) to find relevant schema information
 - Returning structured references, join hints, and query recipes
 
+**Performance:** Tested with 235 comprehensive questions across all 27 database models. Achieves **82.6% precision** for model+column matching with **100% query success rate**. See [Comprehensive Test Report](artifacts/SCHEMA_RAG_COMPREHENSIVE_TEST_REPORT.md) for detailed results.
+
 ## Features
 
 - **Hybrid Retrieval**: Multi-component scoring system combining semantic vector search, lexical matching, exact match detection, and pattern recognition
-- **High Precision**: Achieves 80.9% precision for model+column matching (96.4% for model matching)
+- **High Precision**: Achieves 82.6% precision for model+column matching (95.7% for model matching) across 235 comprehensive test questions
 - **Query Expansion**: Bidirectional synonym expansion with multi-word phrase support (2-4 word phrases)
 - **Entity Extraction**: Extracts program names, dates, temporal types, and numeric filters from questions
 - **Recipe Prioritization**: Curated query recipes are prioritized with pattern-based boosts
@@ -154,15 +156,40 @@ See [docs/SCHEMA_RAG.md](docs/SCHEMA_RAG.md) for detailed architecture documenta
 
 ## Testing
 
-Comprehensive test results are available:
-- [artifacts/SCHEMA_RAG_TEST_REPORT.md](artifacts/SCHEMA_RAG_TEST_REPORT.md) - Original test report
-- [artifacts/SCORING_REFINEMENT_TEST_RESULTS.md](artifacts/SCORING_REFINEMENT_TEST_RESULTS.md) - Latest test results after scoring improvements
+### Comprehensive Test Results
 
-The test suite evaluates the system with 110 natural language questions and shows:
-- **80.9% precision** for model+column matching (up from 58.2%)
-- **96.4% precision** for model matching (up from 67.3%)
-- **38.1% improvement** in average top scores
-- **162% increase** in average schema references per query
+The Schema RAG system has been thoroughly evaluated with **235 natural language questions** covering all 27 database models, advanced features, and edge cases. See the [Comprehensive Test Report](artifacts/SCHEMA_RAG_COMPREHENSIVE_TEST_REPORT.md) for detailed analysis.
+
+**Overall Performance:**
+- ✅ **100% query success rate** - All queries executed without errors
+- ✅ **82.6% precision** for model+column matching (194/235 questions)
+- ✅ **95.7% precision** for model matching (225/235 questions)
+- ✅ **Rich context** - Average of 3.82 schema refs, 1.55 join hints, 3.35 recipes per query
+
+**Category Performance Highlights:**
+- **Assistant Features**: 100% accuracy (15/15)
+- **Query Recipe Matching**: 93.3% accuracy (14/15)
+- **Synonym Expansion**: 93.3% accuracy (14/15)
+- **Advanced Features**: 90.0% accuracy (18/20)
+- **Entity Extraction**: 86.7% accuracy (13/15)
+
+**Test Reports:**
+- [Comprehensive Test Report](artifacts/SCHEMA_RAG_COMPREHENSIVE_TEST_REPORT.md) - **Latest**: Full analysis of 235-question test suite
+- [Test Suite Enhancement Summary](artifacts/TEST_SUITE_ENHANCEMENT_SUMMARY.md) - Details on test suite expansion
+- [Original Test Report](artifacts/SCHEMA_RAG_TEST_REPORT.md) - Initial 110-question test results
+- [Scoring Refinement Results](artifacts/SCORING_REFINEMENT_TEST_RESULTS.md) - Results after scoring improvements
+
+**Run Tests:**
+```bash
+# Generate test questions
+python scripts/test_schema_rag_comprehensive.py --generate-questions
+
+# Run comprehensive test suite
+python scripts/test_schema_rag_comprehensive.py \
+  --questions artifacts/schema_rag_test_questions.json \
+  --index artifacts/schema_rag_index \
+  --output artifacts/schema_rag_test_results.json
+```
 
 ## Configuration
 

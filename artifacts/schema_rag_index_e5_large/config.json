@@ -1,0 +1,5 @@
+{
+  "dimension": 1024,
+  "model_name": "intfloat/e5-large-v2",
+  "num_documents": 825
+}
