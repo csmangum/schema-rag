@@ -47,7 +47,7 @@ The system requires a schema JSON file in a specific format. You need to provide
 - Relationship mappings and foreign key paths for join hints
 - Column metadata: types, nullable flags, defaults
 
-The schema JSON format should match the structure expected by `generate_schema_rag_docs.py`. You can export this from your SQLAlchemy models using your own tooling or create it manually.
+The schema JSON format should match the structure expected by `generate_schema_rag_docs.py`. See `artifacts/sqlalchemy_models.json` for an example of the expected JSON structure. You can export this from your SQLAlchemy models using your own tooling or create it manually.
 
 ### 2. Document Generation
 
