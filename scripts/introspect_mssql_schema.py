@@ -21,7 +21,7 @@ Or using connection string:
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 try:
     import pyodbc
@@ -51,16 +51,28 @@ def get_connection(server: str = None, database: str = None, username: str = Non
                     key, value = part.split('=', 1)
                     key = key.strip().upper()
                     value = value.strip()
+                    # pymssql does not use ODBC driver specification; ignore it if present
+                    if key == 'DRIVER':
+                        continue
                     if key == 'SERVER':
                         params['server'] = value
                     elif key == 'DATABASE':
                         params['database'] = value
-                    elif key == 'UID':
+                    elif key in ('UID', 'USER', 'USERNAME'):
                         params['user'] = value
-                    elif key == 'PWD':
+                    elif key in ('PWD', 'PASSWORD'):
                         params['password'] = value
             if not params:
-                raise ValueError("Could not parse connection string for pymssql. Use --server, --database, --username, --password instead.")
+                # Connection string did not contain any parameters usable by pymssql.
+                # Fall back to explicit arguments if they were provided.
+                if server or database or username or password:
+                    return pymssql.connect(server=server, database=database,
+                                           user=username, password=password)
+                raise ValueError(
+                    "Could not parse connection string for pymssql: no SERVER, "
+                    "DATABASE, UID/USER, or PWD/PASSWORD parameters found. "
+                    "Use --server, --database, --username, --password instead."
+                )
             return pymssql.connect(**params)
     else:
         if pyodbc:
@@ -272,7 +284,6 @@ def introspect_schema(conn) -> Dict[str, Any]:
         
         columns = get_columns(conn, schema, table)
         foreign_keys = get_foreign_keys(conn, schema, table)
-        primary_keys = get_primary_keys(conn, schema, table)
         relationships = get_relationships(conn, schema, table)
         
         # Add foreign key info to columns
@@ -342,14 +353,22 @@ def main():
     
     # Validate arguments
     if args.connection_string:
+        # Require at least one supported MSSQL driver when using a connection string
         if not pyodbc:
-            parser.error("--connection-string requires pyodbc. Install with: pip install pyodbc")
+            try:
+                import pymssql
+            except ImportError:
+                parser.error(
+                    "--connection-string requires a MSSQL driver. Install with: "
+                    "pip install pyodbc or pip install pymssql"
+                )
     else:
         if not all([args.server, args.database, args.username, args.password]):
             parser.error("--server, --database, --username, and --password are required if not using --connection-string")
     
     # Connect to database
     print("Connecting to database...")
+    conn = None
     try:
         if args.connection_string:
             conn = get_connection(connection_string=args.connection_string)
@@ -363,6 +382,8 @@ def main():
         print("Connected successfully!")
     except Exception as e:
         print(f"Error connecting to database: {e}")
+        if conn:
+            conn.close()
         return 1
     
     try:

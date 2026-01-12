@@ -178,10 +178,12 @@ pip install pymssql
 
 **Note for Linux**: You may need to install the ODBC driver. On Ubuntu/Debian:
 ```bash
-curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list > /etc/apt/sources.list.d/mssql-release.list
-apt-get update
-ACCEPT_EULA=Y apt-get install -y msodbcsql17
+# Modern approach (Ubuntu 22.04+)
+sudo mkdir -p /etc/apt/keyrings
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/mssql-release.list
+sudo apt-get update
+ACCEPT_EULA=Y sudo apt-get install -y msodbcsql17
 ```
 
 ### Introspect MSSQL Schema
@@ -189,17 +191,32 @@ ACCEPT_EULA=Y apt-get install -y msodbcsql17
 Connect to your MSSQL Server database and export the schema:
 
 ```bash
+# Prompt securely for the MSSQL password (input will be hidden)
+read -s -p "Enter MSSQL password: " MSSQL_PASSWORD
+echo
+
 # Using connection parameters
 python scripts/introspect_mssql_schema.py \
   --server localhost \
   --database mydb \
   --username sa \
-  --password mypassword \
+  --password "$MSSQL_PASSWORD" \
   --output artifacts/mssql_models.json
 
 # Or using connection string
 python scripts/introspect_mssql_schema.py \
-  --connection-string "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=mypassword" \
+  --connection-string "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=$MSSQL_PASSWORD" \
+  --output artifacts/mssql_models.json
+```
+
+**Note**: For better security, consider using environment variables instead of command-line arguments:
+```bash
+export MSSQL_PASSWORD="your_password"
+python scripts/introspect_mssql_schema.py \
+  --server localhost \
+  --database mydb \
+  --username sa \
+  --password "$MSSQL_PASSWORD" \
   --output artifacts/mssql_models.json
 ```
 
@@ -216,7 +233,7 @@ python scripts/generate_schema_rag_docs.py \
 
 This will generate query recipes with MSSQL-specific functions:
 - `GETDATE()` instead of `NOW()`
-- `DATEADD(day, -N, GETDATE())` instead of `NOW() - INTERVAL 'N' DAYS`
+- `DATEADD(day, -N, GETDATE())` instead of `NOW() - INTERVAL N DAY` (where `N` is a number of days)
 - `YEAR(column)` (same as other databases)
 
 ### Supported Dialects

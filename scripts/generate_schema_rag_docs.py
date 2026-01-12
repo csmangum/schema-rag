@@ -11,20 +11,20 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 # SQL Dialect Support
 SQL_DIALECTS = {
     "postgresql": {
         "current_timestamp": "NOW()",
-        "date_subtract": "NOW() - INTERVAL '{days}' DAYS",
+        "date_subtract": "NOW() - INTERVAL {days} DAY",
         "date_subtract_alt": "date_sub(NOW(), INTERVAL {days} DAY)",
         "year_function": "YEAR({column})",
     },
     "mysql": {
         "current_timestamp": "NOW()",
-        "date_subtract": "NOW() - INTERVAL '{days}' DAYS",
+        "date_subtract": "NOW() - INTERVAL {days} DAY",
         "date_subtract_alt": "date_sub(NOW(), INTERVAL {days} DAY)",
         "year_function": "YEAR({column})",
     },
@@ -810,7 +810,7 @@ def generate_temporal_recipes(
     date_subtract_n = get_sql_function(dialect, "date_subtract", days="N")
     date_subtract_7 = get_sql_function(dialect, "date_subtract", days=7)
     date_subtract_alt = get_sql_function(dialect, "date_subtract_alt", days="N")
-    current_ts = get_sql_function(dialect, "current_timestamp")
+    date_subtract_alt_7 = get_sql_function(dialect, "date_subtract_alt", days=7)
     
     # "Created in" or "Started in" queries
     if "created" in col_name.lower() or "started" in col_name.lower():
@@ -838,6 +838,7 @@ def generate_temporal_recipes(
                 "keywords": sorted(set(keywords)),
                 "semantics": "Temporal filtering by year or date range",
                 "recipe_type": "temporal",
+                # Propagate SQL dialect so downstream components can apply dialect-specific handling
                 "dialect": dialect,
             },
         })
@@ -869,6 +870,7 @@ def generate_temporal_recipes(
                 "keywords": sorted(set(keywords)),
                 "semantics": "Temporal filtering for recent updates",
                 "recipe_type": "temporal",
+                # Propagate SQL dialect so downstream components can apply dialect-specific handling
                 "dialect": dialect,
             },
         })
@@ -879,7 +881,7 @@ def generate_temporal_recipes(
         f"Recipe: {model_name.lower()} {col_name.replace('_', ' ')} in the last week. "
         f"Query {table_name} table. "
         f"Filter by {col_name} >= {date_subtract_7} or "
-        f"WHERE {col_name} >= {date_subtract_alt.replace('N', '7')}. "
+        f"WHERE {col_name} >= {date_subtract_alt_7}. "
         f"Return records from the last week."
     ]
     
@@ -896,9 +898,10 @@ def generate_temporal_recipes(
             "column": col_name,
             "join_hints": [],
             "keywords": sorted(set(keywords)),
-            "semantics": "Temporal filtering for last week",
-            "recipe_type": "temporal",
-            "dialect": dialect,
+                "semantics": "Temporal filtering for last week",
+                "recipe_type": "temporal",
+                # Propagate SQL dialect so downstream components can apply dialect-specific handling
+                "dialect": dialect,
         },
     })
     
