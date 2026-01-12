@@ -10,3 +10,8 @@ pytest-cov>=4.0.0
 
 # Optional: For SQLAlchemy model export (if using export script)
 # sqlalchemy>=2.0.0
+
+# Optional: For MSSQL Server schema introspection
+# Install one of:
+# pyodbc>=4.0.0  # Recommended for Windows/Linux
+# pymssql>=2.2.0  # Alternative driver

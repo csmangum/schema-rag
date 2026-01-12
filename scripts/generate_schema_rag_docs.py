@@ -14,6 +14,59 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 
+# SQL Dialect Support
+SQL_DIALECTS = {
+    "postgresql": {
+        "current_timestamp": "NOW()",
+        "date_subtract": "NOW() - INTERVAL {days} DAY",
+        "date_subtract_alt": "date_sub(NOW(), INTERVAL {days} DAY)",
+        "year_function": "YEAR({column})",
+    },
+    "mysql": {
+        "current_timestamp": "NOW()",
+        "date_subtract": "NOW() - INTERVAL {days} DAY",
+        "date_subtract_alt": "date_sub(NOW(), INTERVAL {days} DAY)",
+        "year_function": "YEAR({column})",
+    },
+    "mssql": {
+        "current_timestamp": "GETDATE()",
+        "date_subtract": "DATEADD(day, -{days}, GETDATE())",
+        "date_subtract_alt": "DATEADD(day, -{days}, GETDATE())",
+        "year_function": "YEAR({column})",
+    },
+    "sqlite": {
+        "current_timestamp": "datetime('now')",
+        "date_subtract": "datetime('now', '-{days} days')",
+        "date_subtract_alt": "datetime('now', '-{days} days')",
+        "year_function": "strftime('%Y', {column})",
+    },
+}
+
+
+def get_sql_function(dialect: str, function_name: str, **kwargs) -> str:
+    """Get dialect-specific SQL function.
+    
+    Args:
+        dialect: Database dialect (postgresql, mysql, mssql, sqlite)
+        function_name: Name of the function template
+        **kwargs: Parameters to format into the template
+        
+    Returns:
+        Formatted SQL function string
+    """
+    dialect_lower = dialect.lower()
+    if dialect_lower not in SQL_DIALECTS:
+        # Default to postgresql if unknown dialect
+        dialect_lower = "postgresql"
+    
+    template = SQL_DIALECTS[dialect_lower].get(function_name, "")
+    if not template:
+        # Fallback to postgresql
+        template = SQL_DIALECTS["postgresql"].get(function_name, "")
+    
+    return template.format(**kwargs)
+
+
 def extract_keywords(text: str) -> List[str]:
     """Extract keywords from text (column names, common terms)."""
     # Split on underscores and camelCase
@@ -734,8 +787,15 @@ def generate_aggregation_recipes(
 def generate_temporal_recipes(
     model: Dict[str, Any],
     column: Dict[str, Any],
+    dialect: str = "postgresql",
 ) -> List[Dict[str, Any]]:
-    """Generate recipes for temporal/date-time queries."""
+    """Generate recipes for temporal/date-time queries.
+    
+    Args:
+        model: Model dictionary
+        column: Column dictionary
+        dialect: Database dialect (postgresql, mysql, mssql, sqlite)
+    """
     recipes = []
     col_name = column["name"]
     col_type = column["type"].lower()
@@ -745,13 +805,20 @@ def generate_temporal_recipes(
     if "datetime" not in col_type and "date" not in col_type:
         return recipes
     
+    # Get dialect-specific SQL functions
+    year_func = get_sql_function(dialect, "year_function", column=col_name)
+    date_subtract_n = get_sql_function(dialect, "date_subtract", days="N")
+    date_subtract_7 = get_sql_function(dialect, "date_subtract", days=7)
+    date_subtract_alt = get_sql_function(dialect, "date_subtract_alt", days="N")
+    date_subtract_alt_7 = get_sql_function(dialect, "date_subtract_alt", days=7)
+    
     # "Created in" or "Started in" queries
     if "created" in col_name.lower() or "started" in col_name.lower():
         recipe_id = f"query_recipe:{col_name}_in_year"
         text_parts = [
             f"Recipe: {model_name.lower()} {col_name.replace('_', ' ')} in specific year or date range. "
             f"Query {table_name} table. "
-            f"Filter by {col_name} using date functions: WHERE YEAR({col_name}) = year or "
+            f"Filter by {col_name} using date functions: WHERE {year_func} = year or "
             f"WHERE {col_name} >= start_date AND {col_name} <= end_date. "
             f"Return matching records."
         ]
@@ -771,6 +838,8 @@ def generate_temporal_recipes(
                 "keywords": sorted(set(keywords)),
                 "semantics": "Temporal filtering by year or date range",
                 "recipe_type": "temporal",
+                # Propagate SQL dialect so downstream components can apply dialect-specific handling
+                "dialect": dialect,
             },
         })
     
@@ -780,8 +849,8 @@ def generate_temporal_recipes(
         text_parts = [
             f"Recipe: {model_name.lower()} {col_name.replace('_', ' ')} recently. "
             f"Query {table_name} table. "
-            f"Filter by {col_name} using time range: WHERE {col_name} >= NOW() - INTERVAL 'N' DAYS "
-            f"or WHERE {col_name} >= date_sub(NOW(), INTERVAL 'N' DAYS). "
+            f"Filter by {col_name} using time range: WHERE {col_name} >= {date_subtract_n} "
+            f"or WHERE {col_name} >= {date_subtract_alt}. "
             f"Order by {col_name} DESC to show most recent first. "
             f"Return recently updated records."
         ]
@@ -801,6 +870,8 @@ def generate_temporal_recipes(
                 "keywords": sorted(set(keywords)),
                 "semantics": "Temporal filtering for recent updates",
                 "recipe_type": "temporal",
+                # Propagate SQL dialect so downstream components can apply dialect-specific handling
+                "dialect": dialect,
             },
         })
     
@@ -809,8 +880,8 @@ def generate_temporal_recipes(
     text_parts = [
         f"Recipe: {model_name.lower()} {col_name.replace('_', ' ')} in the last week. "
         f"Query {table_name} table. "
-        f"Filter by {col_name} >= NOW() - INTERVAL '7' DAYS or "
-        f"WHERE {col_name} >= date_sub(NOW(), INTERVAL 7 DAY). "
+        f"Filter by {col_name} >= {date_subtract_7} or "
+        f"WHERE {col_name} >= {date_subtract_alt_7}. "
         f"Return records from the last week."
     ]
     
@@ -827,8 +898,10 @@ def generate_temporal_recipes(
             "column": col_name,
             "join_hints": [],
             "keywords": sorted(set(keywords)),
-            "semantics": "Temporal filtering for last week",
-            "recipe_type": "temporal",
+                "semantics": "Temporal filtering for last week",
+                "recipe_type": "temporal",
+                # Propagate SQL dialect so downstream components can apply dialect-specific handling
+                "dialect": dialect,
         },
     })
     
@@ -1012,8 +1085,13 @@ def generate_generic_recipes(
     return recipes
 
 
-def generate_documents(schema_data: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Generate all RAG documents from schema data."""
+def generate_documents(schema_data: Dict[str, Any], dialect: str = "postgresql") -> List[Dict[str, Any]]:
+    """Generate all RAG documents from schema data.
+    
+    Args:
+        schema_data: Schema data dictionary
+        dialect: Database dialect (postgresql, mysql, mssql, sqlite)
+    """
     documents = []
     models = schema_data.get("models", [])
     
@@ -1065,7 +1143,7 @@ def generate_documents(schema_data: Dict[str, Any]) -> List[Dict[str, Any]]:
             documents.extend(agg_recipes)
             
             # 5. Generate temporal recipes for datetime columns
-            temp_recipes = generate_temporal_recipes(model, column)
+            temp_recipes = generate_temporal_recipes(model, column, dialect=dialect)
             documents.extend(temp_recipes)
             
             # 6. Generate status recipes for status/state columns
@@ -1178,6 +1256,13 @@ def main():
         default="artifacts/schema_rag_curated_recipes.jsonl",
         help="Path to curated recipes JSONL file (optional)",
     )
+    parser.add_argument(
+        "--dialect",
+        type=str,
+        default="postgresql",
+        choices=["postgresql", "mysql", "mssql", "sqlite"],
+        help="Database dialect for SQL syntax in query recipes (default: postgresql)",
+    )
     args = parser.parse_args()
     
     schema_path = Path(args.schema)
@@ -1192,8 +1277,8 @@ def main():
     with open(schema_path, "r", encoding="utf-8") as f:
         schema_data = json.load(f)
     
-    print("Generating documents...")
-    documents = generate_documents(schema_data)
+    print(f"Generating documents with dialect: {args.dialect}...")
+    documents = generate_documents(schema_data, dialect=args.dialect)
     
     # Load and merge curated recipes
     curated_recipes = load_curated_recipes(curated_path)
