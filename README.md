@@ -37,7 +37,11 @@ pip install faiss-cpu sentence-transformers
 
 ### 1. Generate Documents from Schema JSON
 
-First, you need a schema JSON file. If you're using SQLAlchemy, you can export your models to JSON (see example export script), or provide your own schema JSON in this format:
+First, you need a schema JSON file. You can:
+
+- **For SQLAlchemy**: Export your models to JSON (see example export script)
+- **For MSSQL Server**: Use the introspection script (see [MSSQL Server Support](#mssql-server-support) below)
+- **For other databases**: Provide your own schema JSON in this format:
 
 ```json
 {
@@ -63,7 +67,8 @@ Generate RAG documents:
 ```bash
 python scripts/generate_schema_rag_docs.py \
   --schema artifacts/sqlalchemy_models.json \
-  --out artifacts/schema_rag_docs.jsonl
+  --out artifacts/schema_rag_docs.jsonl \
+  --dialect postgresql  # Options: postgresql, mysql, mssql, sqlite
 ```
 
 ### 2. Build FAISS Index
@@ -153,6 +158,76 @@ See [docs/SCHEMA_RAG.md](docs/SCHEMA_RAG.md) for detailed architecture documenta
 - `scripts/generate_schema_rag_docs.py`: Generate RAG documents from schema JSON
 - `scripts/build_schema_rag_index.py`: Build FAISS index from documents
 - `scripts/query_schema_rag.py`: Command-line query tool
+- `scripts/introspect_mssql_schema.py`: Introspect MSSQL Server schema and export to JSON
+
+## MSSQL Server Support
+
+Schema RAG now supports MSSQL Server with dialect-specific SQL syntax in query recipes.
+
+### Installation
+
+Install a MSSQL driver (choose one):
+
+```bash
+# Option 1: pyodbc (recommended for Windows/Linux)
+pip install pyodbc
+
+# Option 2: pymssql (alternative)
+pip install pymssql
+```
+
+**Note for Linux**: You may need to install the ODBC driver. On Ubuntu/Debian:
+```bash
+curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list > /etc/apt/sources.list.d/mssql-release.list
+apt-get update
+ACCEPT_EULA=Y apt-get install -y msodbcsql17
+```
+
+### Introspect MSSQL Schema
+
+Connect to your MSSQL Server database and export the schema:
+
+```bash
+# Using connection parameters
+python scripts/introspect_mssql_schema.py \
+  --server localhost \
+  --database mydb \
+  --username sa \
+  --password mypassword \
+  --output artifacts/mssql_models.json
+
+# Or using connection string
+python scripts/introspect_mssql_schema.py \
+  --connection-string "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=mypassword" \
+  --output artifacts/mssql_models.json
+```
+
+### Generate Documents with MSSQL Dialect
+
+When generating RAG documents, specify the `mssql` dialect to use MSSQL-specific SQL syntax in query recipes:
+
+```bash
+python scripts/generate_schema_rag_docs.py \
+  --schema artifacts/mssql_models.json \
+  --out artifacts/schema_rag_docs.jsonl \
+  --dialect mssql
+```
+
+This will generate query recipes with MSSQL-specific functions:
+- `GETDATE()` instead of `NOW()`
+- `DATEADD(day, -N, GETDATE())` instead of `NOW() - INTERVAL 'N' DAYS`
+- `YEAR(column)` (same as other databases)
+
+### Supported Dialects
+
+The `--dialect` parameter supports:
+- `postgresql` (default)
+- `mysql`
+- `mssql`
+- `sqlite`
+
+Each dialect uses appropriate SQL syntax in generated query recipes.
 
 ## Testing
 
