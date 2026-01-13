@@ -4,36 +4,58 @@
 This script connects to a MSSQL Server database and exports the schema
 in the format expected by generate_schema_rag_docs.py.
 
-Usage:
+SECURITY NOTE: This script supports secure password handling. Avoid passing
+passwords via command-line arguments as they may be visible in process listings.
+
+Recommended Usage (secure):
+    # Option 1: Environment variable (recommended)
+    export MSSQL_PASSWORD="your_password"
     python scripts/introspect_mssql_schema.py \
         --server localhost \
         --database mydb \
         --username sa \
-        --password mypassword \
         --output artifacts/mssql_models.json
 
-Or using connection string:
+    # Option 2: Interactive prompt (secure)
     python scripts/introspect_mssql_schema.py \
-        --connection-string "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=mypassword" \
+        --server localhost \
+        --database mydb \
+        --username sa \
+        --output artifacts/mssql_models.json
+    # You will be prompted securely for the password
+
+    # Option 3: Password file
+    python scripts/introspect_mssql_schema.py \
+        --server localhost \
+        --database mydb \
+        --username sa \
+        --password-file /path/to/secure/password.txt \
+        --output artifacts/mssql_models.json
+
+Alternative (connection string via environment variable):
+    export MSSQL_CONNECTION_STRING="DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=your_password"
+    python scripts/introspect_mssql_schema.py \
         --output artifacts/mssql_models.json
 """
 
 import argparse
+import getpass
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
+# Try to import MSSQL drivers (checked later during connection)
+pyodbc = None
+pymssql = None
 try:
     import pyodbc
 except ImportError:
     try:
         import pymssql
-        pyodbc = None
     except ImportError:
-        print("Error: Missing MSSQL driver. Install one of:")
-        print("  pip install pyodbc")
-        print("  pip install pymssql")
-        exit(1)
+        pass  # Will check and error during connection attempt
 
 
 def get_connection(server: str = None, database: str = None, username: str = None,
@@ -309,38 +331,111 @@ def introspect_schema(conn) -> Dict[str, Any]:
     return {"models": models}
 
 
+def get_password_secure(args) -> str:
+    """Get password securely from various sources.
+    
+    Priority order:
+    1. Password file (--password-file)
+    2. Environment variable (MSSQL_PASSWORD)
+    3. Interactive prompt (getpass)
+    
+    Returns:
+        Password string
+        
+    Raises:
+        SystemExit if password cannot be obtained
+    """
+    # Option 1: Password file
+    if args.password_file:
+        password_path = Path(args.password_file)
+        if not password_path.exists():
+            print(f"Error: Password file not found: {args.password_file}", file=sys.stderr)
+            sys.exit(1)
+        try:
+            with open(password_path, "r", encoding="utf-8") as f:
+                password = f.read().strip()
+            if not password:
+                print(f"Error: Password file is empty: {args.password_file}", file=sys.stderr)
+                sys.exit(1)
+            return password
+        except PermissionError:
+            print(f"Error: Cannot read password file (permission denied): {args.password_file}", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error: Failed to read password file: {type(e).__name__}", file=sys.stderr)
+            sys.exit(1)
+    
+    # Option 2: Environment variable
+    password = os.environ.get("MSSQL_PASSWORD")
+    if password:
+        return password
+    
+    # Option 3: Interactive prompt
+    if sys.stdin.isatty():
+        try:
+            password = getpass.getpass("Enter MSSQL password: ")
+            if not password:
+                print("Error: Password cannot be empty", file=sys.stderr)
+                sys.exit(1)
+            return password
+        except (EOFError, KeyboardInterrupt):
+            print("\nPassword input cancelled", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print("Error: No password provided. Use one of:", file=sys.stderr)
+        print("  - Set MSSQL_PASSWORD environment variable", file=sys.stderr)
+        print("  - Use --password-file option", file=sys.stderr)
+        print("  - Run interactively for secure prompt", file=sys.stderr)
+        sys.exit(1)
+
+
+def get_connection_string_secure() -> str:
+    """Get connection string from environment variable.
+    
+    Returns:
+        Connection string or None if not set
+    """
+    return os.environ.get("MSSQL_CONNECTION_STRING")
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Introspect MSSQL Server schema and export to JSON"
+        description="Introspect MSSQL Server schema and export to JSON",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Security Notes:
+  - Passwords are obtained securely via environment variable, file, or interactive prompt
+  - Avoid passing passwords on command line as they may be visible in process listings
+  - Set MSSQL_PASSWORD environment variable or use --password-file for automation
+  - Connection strings can be set via MSSQL_CONNECTION_STRING environment variable
+        """
     )
     
     # Connection options
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
+    parser.add_argument(
         "--connection-string",
         type=str,
-        help="ODBC connection string (e.g., 'DRIVER={...};SERVER=...;DATABASE=...;UID=...;PWD=...')",
+        help="ODBC connection string. For security, prefer setting MSSQL_CONNECTION_STRING env var instead.",
     )
-    group.add_argument(
+    parser.add_argument(
         "--server",
         type=str,
-        help="Database server (required if not using --connection-string)",
+        help="Database server hostname or IP",
     )
-    
     parser.add_argument(
         "--database",
         type=str,
-        help="Database name (required if not using --connection-string)",
+        help="Database name",
     )
     parser.add_argument(
         "--username",
         type=str,
-        help="Username (required if not using --connection-string)",
+        help="Database username",
     )
     parser.add_argument(
-        "--password",
+        "--password-file",
         type=str,
-        help="Password (required if not using --connection-string)",
+        help="Path to file containing password (more secure than command-line)",
     )
     parser.add_argument(
         "--output",
@@ -351,37 +446,73 @@ def main():
     
     args = parser.parse_args()
     
-    # Validate arguments
-    if args.connection_string:
-        # Require at least one supported MSSQL driver when using a connection string
+    # Determine connection method
+    connection_string = args.connection_string or get_connection_string_secure()
+    
+    if connection_string:
+        # Using connection string
         if not pyodbc:
             try:
                 import pymssql
             except ImportError:
-                parser.error(
-                    "--connection-string requires a MSSQL driver. Install with: "
-                    "pip install pyodbc or pip install pymssql"
-                )
+                print("Error: MSSQL driver required. Install with: pip install pyodbc or pip install pymssql", file=sys.stderr)
+                sys.exit(1)
+    elif args.server:
+        # Using individual parameters - need database and username
+        if not args.database:
+            parser.error("--database is required when using --server")
+        if not args.username:
+            parser.error("--username is required when using --server")
     else:
-        if not all([args.server, args.database, args.username, args.password]):
-            parser.error("--server, --database, --username, and --password are required if not using --connection-string")
+        parser.error("Either --server or --connection-string (or MSSQL_CONNECTION_STRING env var) is required")
+    
+    # Check for MSSQL driver availability
+    if not pyodbc and not pymssql:
+        print("Error: Missing MSSQL driver. Install one of:", file=sys.stderr)
+        print("  pip install pyodbc", file=sys.stderr)
+        print("  pip install pymssql", file=sys.stderr)
+        return 1
+    
+    # Get password securely if using individual parameters
+    password = None
+    if not connection_string:
+        password = get_password_secure(args)
     
     # Connect to database
     print("Connecting to database...")
     conn = None
     try:
-        if args.connection_string:
-            conn = get_connection(connection_string=args.connection_string)
+        if connection_string:
+            conn = get_connection(connection_string=connection_string)
         else:
             conn = get_connection(
                 server=args.server,
                 database=args.database,
                 username=args.username,
-                password=args.password,
+                password=password,
             )
         print("Connected successfully!")
     except Exception as e:
-        print(f"Error connecting to database: {e}")
+        # Sanitize error message to avoid leaking credentials
+        error_type = type(e).__name__
+        error_msg = str(e)
+        
+        # Remove potential password from error message
+        if password and password in error_msg:
+            error_msg = error_msg.replace(password, "***")
+        if connection_string:
+            # Mask any PWD= values in connection string errors
+            import re
+            error_msg = re.sub(r'PWD=[^;]*', 'PWD=***', error_msg, flags=re.IGNORECASE)
+            error_msg = re.sub(r'PASSWORD=[^;]*', 'PASSWORD=***', error_msg, flags=re.IGNORECASE)
+        
+        print(f"Error connecting to database: {error_type}", file=sys.stderr)
+        print(f"Details: {error_msg}", file=sys.stderr)
+        print("\nPlease verify:", file=sys.stderr)
+        print("  - Server hostname/IP is correct and reachable", file=sys.stderr)
+        print("  - Database name exists", file=sys.stderr)
+        print("  - Username and password are correct", file=sys.stderr)
+        print("  - Required ODBC driver is installed", file=sys.stderr)
         if conn:
             conn.close()
         return 1
@@ -402,9 +533,16 @@ def main():
         print(f"✓ Exported {len(schema_data['models'])} models to {output_path}")
         
     except Exception as e:
-        print(f"Error introspecting schema: {e}")
-        import traceback
-        traceback.print_exc()
+        # Sanitize error - don't print full traceback which may contain credentials
+        error_type = type(e).__name__
+        error_msg = str(e)
+        
+        # Mask potential credentials in error messages
+        if password and password in error_msg:
+            error_msg = error_msg.replace(password, "***")
+        
+        print(f"Error introspecting schema: {error_type}", file=sys.stderr)
+        print(f"Details: {error_msg}", file=sys.stderr)
         return 1
     finally:
         conn.close()

@@ -188,37 +188,62 @@ ACCEPT_EULA=Y sudo apt-get install -y msodbcsql17
 
 ### Introspect MSSQL Schema
 
-Connect to your MSSQL Server database and export the schema:
+Connect to your MSSQL Server database and export the schema. The script supports secure password handling through multiple methods:
+
+#### Option 1: Environment Variable (Recommended for Automation)
 
 ```bash
-# Prompt securely for the MSSQL password (input will be hidden)
-read -s -p "Enter MSSQL password: " MSSQL_PASSWORD
-echo
-
-# Using connection parameters
-python scripts/introspect_mssql_schema.py \
-  --server localhost \
-  --database mydb \
-  --username sa \
-  --password "$MSSQL_PASSWORD" \
-  --output artifacts/mssql_models.json
-
-# Or using connection string
-python scripts/introspect_mssql_schema.py \
-  --connection-string "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=$MSSQL_PASSWORD" \
-  --output artifacts/mssql_models.json
-```
-
-**Note**: For better security, consider using environment variables instead of command-line arguments:
-```bash
+# Set password as environment variable (not visible in process listings)
 export MSSQL_PASSWORD="your_password"
+
+# Run without --password flag - script reads from MSSQL_PASSWORD
 python scripts/introspect_mssql_schema.py \
   --server localhost \
   --database mydb \
   --username sa \
-  --password "$MSSQL_PASSWORD" \
   --output artifacts/mssql_models.json
 ```
+
+#### Option 2: Interactive Prompt (Recommended for Manual Use)
+
+```bash
+# Run without password - you will be prompted securely
+python scripts/introspect_mssql_schema.py \
+  --server localhost \
+  --database mydb \
+  --username sa \
+  --output artifacts/mssql_models.json
+# Enter MSSQL password: (input hidden)
+```
+
+#### Option 3: Password File (For Secure Automation)
+
+```bash
+# Create a password file with restricted permissions
+echo "your_password" > ~/.mssql_password
+chmod 600 ~/.mssql_password
+
+# Use --password-file option
+python scripts/introspect_mssql_schema.py \
+  --server localhost \
+  --database mydb \
+  --username sa \
+  --password-file ~/.mssql_password \
+  --output artifacts/mssql_models.json
+```
+
+#### Option 4: Connection String via Environment Variable
+
+```bash
+# Set full connection string as environment variable
+export MSSQL_CONNECTION_STRING="DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=mydb;UID=sa;PWD=your_password"
+
+# Run with just output path
+python scripts/introspect_mssql_schema.py \
+  --output artifacts/mssql_models.json
+```
+
+> **Security Note**: Avoid passing passwords directly on the command line (e.g., `--password mypassword`) as they may be visible in process listings (`ps aux`) and shell history.
 
 ### Generate Documents with MSSQL Dialect
 
